@@ -64,7 +64,18 @@ If this is hard, critically consider whether the code is high quality. The PR de
 Finally:
 - Be brief
 - Adhere to the repository's style for PR descriptions
-- Include a test plan that a new teammate could follow their first week
+
+## Testing and PR Test Plans
+
+PRs must include a test plan that a new teammate could follow their first week.
+
+PR test plans SHOULD show specific commands to run relevant tests. DON'T list tests added/changed with commentary, that doesn't help people run the tests. The tests themselves should be self explanatory about what they are testing.
+
+Automated tests are preferable to manual tests. However manual tests can be useful for QA or curious people, so adding brief manual test plans is also good. Relying only on manual tests should only happen in exceptional situations.
+
+"Performative" automated testing--writing tests which provide little sensitivity to likely changes of interest--is harmful because it clutters the test suite and distracts from the effective tests. Such tests MUST be avoided.
+
+DON'T write "what could break" in test plans. We should be striving for code which doesn't break. If improvements are actionable right now within the scope of the PR, then do the work. If the work is actionable right now, but outside the scope of the PR, consider a separate clean-up or refactoring PR. If work is not actionable right now, but will be when conditions are right, use a TODO in the code. If the code is permanently defective, use a caveat.
 
 ## Linear
 
