@@ -15,7 +15,7 @@ You should eliminate the possibility of bugs arising by reducing repetition. For
 
 - If a function already exists which does what you want, reuse it. If it is not accessible, make it accessible instead of cutting and pasting it.
 - Ensure consistency by making things intrinsically consistent at the type level by encoding a constraint, at the implementation level by reusing functions, within a function by writing assertions, creating const variables, etc. DON'T simply duplicate things because it is convenient, because one of those duplicates may get edited and become inconsistent with the others.
-- Where essential complexity exists, express it in the clearest way possible. For example, a state machine can succinctly encode a system and make it clear whether there's a fixed set of states, an infinite set, and so on. The Strategy pattern can be used to simplify a lot of conditionals spread across codebase into one conditional statement that creates a FooStrategy, BarStrategy or NullStrategy.
+- Where essential complexity exists, express it in the clearest way possible. Use a state machine can succinctly encode a system and make it clear whether there's a fixed set of states or an infinite set. Use Strategy pattern to consolidate a lot of conditionals spread across codebase into one conditional statement that creates a FooStrategy, BarStrategy or NullStrategy.
 
 Avoid needless variation. For example, if in one function your refer to something as `accessToken`, and in another context you refer to the same concept simply as `token`, this implies a distinction that does not exist. Be specific, brief and above all: consistent.
 
@@ -32,6 +32,10 @@ Phrase comments for the "eternal now" of the code as the reader will encounter i
 Phrase TODOs as `TODO: What when.` *What* briefly explains what to change; and *when* briefly explains the condition which will "unlock" the clean-up. Think critically about "when": If the cleanup is not blocked now, prefer to just do it. If the cleanup is likely blocked forever, then a TODO is not appropriate, but a comment briefly explaining the compromise/limitation.
 
 ## Pull Requests
+
+Pull request branch names should be prefixed with dpc/ and have a brief, compelling topic. Feel free to rename the local branch name to match the topic name. For example, in a worktree you may find yourself working with a local branch name like 'cline5' or 'main' but you should rename it to 'fix-foo' and make the remote branch 'dpc/fix-foo'.
+
+### Pull Request Text
 
 In pull requests, as in comments, stick to the facts. The PR description should not dwell on ephemeral debugging steps, "phases" of implementation work, etc. Instead, motivate the change by following the Pyramid Principle:
 
@@ -65,7 +69,7 @@ Finally:
 - Be brief
 - Adhere to the repository's style for PR descriptions
 
-## Testing and PR Test Plans
+### Testing and PR Test Plans
 
 PRs must include a test plan that a new teammate could follow their first week.
 
