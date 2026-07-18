@@ -1,3 +1,14 @@
+## Workflow: Plan, Implement, Review
+
+For any change that is more than plumbing (i.e. it touches configuration, state, concurrency, external contracts, or crosses a process/host boundary), bracket the work with two skills:
+
+- **Before implementing**, use the `systems-change-planning` skill. It locates the essential complexity, chooses the simplest structure to make failures unrepresentable, and derives invariants, environments, and the consistency boundary from the change.
+- **Before opening or updating a PR**, use the `inventory-review` skill. It enumerates the resources, state machines, decision points, contracts, and suspension points in the diff and applies fixed per-type checks. Findings are failed checks — there is no quota, and zero findings is a legitimate outcome. Discovery is read-only; triage before fixing.
+
+The plan's declared invariants shrink the review: a stated consistency boundary collapses whole families of interleaving questions into one check.
+
+As part of planning, draft the PR description skeleton (see Pull Request Text below): the Situation/Complication/Answer introduction and the test plan's commands, with gaps where results will go. The Answer is the plan's central promise; if you cannot draft the introduction, the design is not understood yet. Keep it to a dozen lines — this is a sketch to be completed at PR time, not an Amazon-style PRFAQ.
+
 ## Simplicity
 
 You have been trained to economize tokens and tool calls, but this causes you to do things like (BAD example):
@@ -19,11 +30,25 @@ You should eliminate the possibility of bugs arising by reducing repetition. For
 
 Avoid needless variation. For example, if in one function your refer to something as `accessToken`, and in another context you refer to the same concept simply as `token`, this implies a distinction that does not exist. Be specific, brief and above all: consistent.
 
+Never introduce a pair of values that must agree but are set independently (a description and a behavior, a writer and a reader, a render order and a selection index). Derive both from one source, or snapshot them together so they travel as a unit.
+
+## Contracts
+
+When code interprets an external value — a configuration field, an API response, a file format — model the full declared contract from its authoritative schema or types, not the shape observed in examples.
+
+When you change a shared value's shape, event, location, or API, you have changed a contract: grep for every producer, consumer, cache, and reporter (including features from other PRs) and re-verify each. A migration is a write — audit all readers of both the old and new shapes.
+
 ## Reliability
 
 Do not design functions or methods with critical return values which are easily ignored by the caller. If the caller should handle a result, use types which force the caller to handle the result in languages which can do that (Rust, C++.) In other languages (JavaScript, TypeScript) you may need to use continuations, exceptions, etc.
 
 Functions and methods should first check their preconditions, read data, and then write data. Avoid interleaving reads and writes which could cause updates based on "torn" read state. Avoid failing in "half done" write states.
+
+In async code, every `await` is a place where torn reads happen: state read before it may be invalid after it, including via re-entry of the same procedure. Justify each mutating procedure by one of, in order of preference: an atomic section (all reads and writes between the same pair of awaits — single-threadedness is an asset, use it); a snapshot with an identity recheck after the awaits (object identity, never an ID that a rebuild may reuse, and re-check dynamic state like `isRunning`); serialization through an existing queue or mutex; or idempotence.
+
+For every mutable setting that affects behavior, state when a change takes effect (immediately, next tool call, next model request, next session) and make everything that must agree transition at that same boundary. For every resource or pending flag, account for all exits: success, error, cancel, timeout, disposal, replacement, and concurrent re-entry. Never report success when the requested work failed, was killed, or is still running.
+
+Tests must cross the boundary where the risk lives: use the real implementation rather than a stub that re-implements the invariant, and when the risk is in packaging or an older runtime, test the shipped artifact or pin to the minimum runtime's API definitions.
 
 ## Comments
 
