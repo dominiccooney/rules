@@ -1,0 +1,4 @@
+# Skill directories copied from ../Skills into ~/.cline/skills.
+backlog-pr-review
+inventory-review
+systems-change-planning
