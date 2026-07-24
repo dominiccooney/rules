@@ -80,15 +80,28 @@ concretely, it is a question for the author, not a finding.
 
 Triage each finding:
 
-- **Blocker** — violates the PR's central promise or a declared invariant;
-  breaks a supported environment; false success or misleading UI; data loss /
-  security / unintended code execution; silent or hard to recover; dead in
-  the shipped artifact; turns an opt-in limitation into a default regression.
-- **Follow-up** — real but: unusual unsupported trigger, obvious+harmless+
-  recoverable, pre-existing without increased exposure, or fix is
-  disproportionate architecture work.
+- **Blocker** — must be fixed in this PR. A finding is a blocker when it is
+  real, introduced or touched by this PR, and fixable locally with effort
+  proportional to the PR's scope. This includes: violates the PR's central
+  promise or a declared invariant; breaks a supported environment; false
+  success or misleading UI; data loss / security / unintended code execution;
+  silent or hard to recover; dead in the shipped artifact; turns an opt-in
+  limitation into a default regression. It also includes duplication that will
+  drift under maintenance when the fix is a few lines in files the PR already
+  touches.
+- **Follow-up** — real but genuinely out of scope for this PR: unusual
+  unsupported trigger, obvious+harmless+recoverable, pre-existing without
+  increased exposure, or the fix is disproportionate architecture work that
+  belongs in its own PR. When in doubt between blocker and follow-up, ask: is
+  the fix proportional to the PR's scope and in files the PR already touches?
+  If yes, it is a blocker. Do not use "follow-up" to defer fixes that are
+  small, local, and in-scope just because the code works today — duplication
+  that can't get out of sync is a defect, not a future concern.
 - **Accepted limitation** — deliberate, acceptable, but non-obvious: request
-  a code comment or PR caveat.
+  a code comment or PR caveat. Before accepting a limitation, verify the
+  stated rationale against the codebase. An accepted limitation based on a
+  false premise (e.g. "can't import due to cross-world barrier" when runtime
+  imports from that package already exist) is an unreviewed defect.
 - **Not actionable** — record why, then drop.
 
 Apply the **smallest sufficient response** to blockers. Do not recommend
