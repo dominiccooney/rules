@@ -17,17 +17,18 @@ Stop at the first decisive gate:
 
 1. **Legitimacy and safety:** Is this a genuine contribution rather than spam,
    phishing, or meaningless churn?
-2. **Purpose and hygiene:** Is the intended outcome focused and understandable?
+2. **Present relevance:** Is the problem already fixed, the proposal duplicated,
+   the feature removed, or the changed path superseded on current `main`? Check
+   this early: it is the cheapest decisive gate, and there is no point weighing
+   purpose, direction, or engineering on work that is already shipped. Verify
+   against `main` today, not against the state when the PR was opened.
+3. **Purpose and hygiene:** Is the intended outcome focused and understandable?
    Is there enough issue/reproduction/context to evaluate it? Scale hygiene
    expectations with scope.
-3. **Product direction:** If it worked exactly as described, would Cline want
+4. **Product direction:** If it worked exactly as described, would Cline want
    the behavior? For unapproved cross-product policy or architecture, redirect
    to discussion rather than reviewing a large implementation.
-4. **Present relevance:** Is the problem already fixed, the proposal duplicated,
-   the feature removed, or the changed path superseded?
-5. **Current applicability:** Does the PR affect the shipped path today? A clean
-   rebase proves textual compatibility, not relevance.
-6. **Engineering review:** If the PR survives, hand it to existing engineering
+5. **Engineering review:** If the PR survives, hand it to existing engineering
    rules and review skills. Do not recreate their caller, contract, concurrency,
    UI, or testing checks here.
 
@@ -35,6 +36,27 @@ Common dispositions are: close as duplicate, superseded, already implemented,
 obsolete, or out of direction; request a split or prior design discussion; or
 advance to engineering review. A useful sub-change in an otherwise rejected PR
 is a lead to verify independently, not a reason to keep the PR open.
+
+## Probing relevance
+
+A clean rebase proves textual compatibility, not relevance; the problem may
+already be solved another way. Conversely, a rebase that fails proves nothing on
+its own — read *why* it failed:
+
+- **Adjacent-line noise:** the surrounding code shifted and your change's target
+  still exists. This is textual churn, not a relevance signal. Resolve and move
+  on.
+- **The target is gone or replaced:** the list, function, or mechanism the PR
+  modifies no longer exists. This is a strong supersession signal. Find what
+  replaced it before resolving anything.
+
+When a PR adds an entry to a hand-maintained list (providers, commands, tools,
+model catalogs), check whether that list still exists. A backlog contribution
+against the old mechanism is superseded when the mechanism itself was replaced by
+generation or data-driven registration — even when no one added the PR's specific
+item by hand. A large regenerated artifact in the diff (a generated catalog,
+lockfile, or snapshot) is a hint that generation may now be the system, not just
+an output.
 
 ## Closure messages
 
