@@ -10,6 +10,21 @@ against an inventory, so every finding arrives evidence-backed and **zero
 findings is a legitimate output** when the inventory is complete. There is
 no quota; do not reach.
 
+## Invocation contexts
+
+This skill has two independent entry points:
+
+1. **Pre-PR development review:** invoke it on the developer's local diff before
+   opening or updating a PR. Fix or explicitly triage its blockers before
+   submission.
+2. **Existing-PR engineering review:** `backlog-pr-review` invokes it when a
+   contributor PR survives Gates 1–4. Return the findings to that workflow,
+   which owns the review action and contributor communication.
+
+The backlog-review entry point supplements rather than replaces pre-PR review.
+In either context, this skill owns read-only discovery and finding triage; its
+caller owns edits, GitHub actions, and other state changes.
+
 **Discovery is strictly read-only.** Build the full inventory and findings
 list before proposing or making any edit. Do not broaden scope during review.
 

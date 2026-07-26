@@ -66,7 +66,8 @@ Gate 5 is one handoff, not a second independent review:
 `inventory-review` is read-only discovery. This skill still owns the GitHub
 action and contributor communication. Do not run a second inventory pass merely
 to confirm the first; repeat it only when the reviewed diff or a relevant
-`main` contract changed.
+`main` contract changed. Gate 5 is an additional invocation context for
+`inventory-review`; it does not replace that skill's pre-PR development review.
 
 ## Evidence record
 
