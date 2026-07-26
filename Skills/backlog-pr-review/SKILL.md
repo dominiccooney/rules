@@ -28,10 +28,13 @@ Stop at the first decisive gate:
 
 1. **Legitimacy and safety:** Is this a genuine contribution rather than spam,
    phishing, or meaningless churn?
-2. **Present relevance:** Is the problem already fixed, the proposal duplicated,
-   the feature removed, or the changed path superseded on current `main`? This
-   comes second because it is the cheapest decisive gate: there is no point
-   weighing purpose, direction, or engineering on work that is already shipped.
+2. **Present relevance:** Is the *problem* already fixed, the proposal
+   duplicated, the feature removed, or the behavior superseded on current
+   `main`? Relevance is a property of the problem, not of the diff: a PR
+   exists to fix a defect or add a capability, and its files are merely where
+   that problem lived when the PR was written. This gate comes second because
+   it is the cheapest decisive gate: there is no point weighing purpose,
+   direction, or engineering on work that is already shipped.
 3. **Purpose and hygiene:** Is the intended outcome focused and understandable?
    Is there enough issue/reproduction/context to evaluate it? Scale hygiene
    expectations with scope.
@@ -43,8 +46,9 @@ Stop at the first decisive gate:
    UI, or testing checks here.
 
 Common dispositions are: close as duplicate, superseded, already implemented,
-obsolete, or out of direction; request a split or prior design discussion; or
-advance to engineering review. A useful sub-change in an otherwise rejected PR
+obsolete, or out of direction; retarget a live fix whose original code path
+was replaced; request a split or prior design discussion; or advance to
+engineering review. A useful sub-change in an otherwise rejected PR
 is a lead to verify independently, not a reason to keep the PR open.
 
 ## Evidence record
@@ -71,8 +75,57 @@ its own — what matters is *why* it failed:
 - **Adjacent-line noise:** the surrounding code shifted but the PR's target
   still exists. Textual churn, not a relevance signal. Resolve and move on.
 - **The target is gone or replaced:** the list, function, or mechanism the PR
-  modifies no longer exists on `main`. A strong supersession signal. Find what
-  replaced it, and record it, before resolving anything.
+  modifies no longer exists on `main`. This is where a rebase or `git grep`
+  probe *stops* being evidence: it has answered "does the diff still apply?",
+  which is never the question. Find what replaced the target and continue to
+  the defect check below before resolving anything.
+
+### Dead file ≠ dead problem
+
+"The code this PR touches is gone" is a fact about the diff, not a
+disposition. Before closing on a replaced target, name the defect or missing
+capability in one sentence *without mentioning any file path* — e.g. "Windows
+shell output in a non-UTF-8 code page is decoded as UTF-8 and garbles" — then
+ask that sentence of the replacement code:
+
+1. **Locate the successor.** Where does the behavior the PR changed live now?
+   For a migration (classic extension → SDK, handwritten list → generator),
+   the successor is usually a specific file you can open, not an abstraction.
+2. **Check the defect against the successor.** Grep the successor for the same
+   hazard the PR fixed (the hardcoded encoding, the missing guard, the
+   unbounded buffer). Three outcomes:
+   - The successor **resolves the problem** (or removed the conditions that
+     produce it, e.g. the whole input path no longer exists): the PR is
+     genuinely obsolete or already implemented. Cite the resolving code in the
+     closure message.
+   - The successor **has the same defect** — often verbatim, since migrations
+     port happy-path assumptions: the PR is a *live fix pointed at the wrong
+     file*. Do not close it as obsolete. Retarget instead (below).
+   - You **cannot find the successor** or cannot tell: the relevance gate is
+     unanswered. Leave the PR for engineering review rather than closing on
+     the half-probe.
+3. **Check the linked issue's state.** An open issue that the PR claims to fix
+   is a strong hint the problem survived whatever replaced the code. Closing
+   the PR as obsolete while its issue stays open should feel contradictory —
+   if the code's removal really fixed the problem, close the issue too, with
+   the same evidence.
+
+### Retargeting a live fix
+
+When the problem is alive but the diff is aimed at removed code, the sweep
+action is a retargeting comment, not a closure. The comment should:
+
+- confirm the diagnosis is still correct and wanted;
+- name the successor path where the defect now lives, with the specific
+  evidence (the hardcoded value, the missing branch);
+- note concrete constraints of the new location the contributor could not
+  know (shared helpers to reuse, streaming/chunking contracts, dependency
+  placement), so a rebase attempt starts from reality;
+- offer to port the fix with attribution if the contributor has moved on.
+
+This keeps the sweep's state-change goal honest: the PR moved one concrete
+step toward merging in its new home, instead of being counted as closed while
+the user-facing bug lives on.
 
 When a PR adds an entry to a hand-maintained list (providers, commands, tools,
 model catalogs), check whether that list still exists on `main`. The PR is
@@ -80,6 +133,12 @@ superseded when the mechanism itself was replaced by generation or data-driven
 registration — even when no one added the PR's specific item by hand. A large
 regenerated artifact in the diff (a generated catalog, lockfile, or snapshot)
 is a hint that generation may now be the system, not just an output.
+
+This mechanism-replacement supersession applies to *capability additions*,
+where the diff's value is the wiring and redoing it means a small data or
+config change in the new mechanism. It does not extend to *defect fixes*: for
+a bug, the diff's value is the diagnosis, and the bug either survived the
+replacement or it didn't — which is exactly the defect check above.
 
 ## Closure messages
 
@@ -127,6 +186,10 @@ Before posting, lint the draft against the evidence record:
 ## Backlog sweep safeguards
 
 - Never close solely because a PR is old, conflicting, or lacks tests.
+- Never close a defect fix as obsolete solely because its files were removed
+  or rewritten. The record must show where the behavior lives now and that
+  the defect is absent there; "target gone" without a successor check is an
+  unanswered gate, not a disposition.
 - Verify every cited replacement is merged and covers the stated purpose, and
   record both checks.
 - Do not post duplicate comments when a batch command times out; re-read remote
