@@ -1,0 +1,2 @@
+# Skill directories removed from ~/.cline/skills during every sync.
+parallel-pr-review
