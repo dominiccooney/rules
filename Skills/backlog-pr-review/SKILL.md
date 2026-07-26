@@ -1,15 +1,14 @@
 ---
 name: backlog-pr-review
-description: Triage a pull-request backlog methodically, decide whether to close or advance each PR, and write concise, respectful reviewer communication. Use for backlog sweeps and closure-message drafting. Defers implementation correctness to engineering review skills.
+description: Triage a pull-request backlog methodically, decide whether to close or advance each PR, and write concise, respectful reviewer communication. Use for backlog sweeps and closure-message drafting. Invokes inventory-review for implementation correctness when a PR reaches engineering review.
 ---
 
 # Backlog PR Review
 
 Review PRs in stages so cheap disposition decisions happen before detailed
 engineering review. This skill owns **triage, disposition, and communication**.
-It does not duplicate software-engineering rules: when a live, aligned PR needs
-implementation analysis, invoke the appropriate planning or inventory-review
-skill instead.
+It does not duplicate software-engineering rules: when a live, aligned PR reaches
+engineering review, invoke the `inventory-review` skill as the required sub-step.
 
 The goal of a sweep is to change each PR's state. A PR you touch should end
 closed, merged, or one concrete step closer to merging — and when that step is
@@ -41,15 +40,33 @@ Stop at the first decisive gate:
 4. **Product direction:** If it worked exactly as described, would Cline want
    the behavior? For unapproved cross-product policy or architecture, redirect
    to discussion rather than reviewing a large implementation.
-5. **Engineering review:** If the PR survives, hand it to existing engineering
-   rules and review skills. Do not recreate their caller, contract, concurrency,
-   UI, or testing checks here.
+5. **Engineering review:** If the PR survives, invoke the `inventory-review`
+   skill against the PR integrated with the current `main` snapshot. Do not
+   recreate its caller, contract, concurrency, UI, or testing checks here.
 
 Common dispositions are: close as duplicate, superseded, already implemented,
 obsolete, or out of direction; retarget a live fix whose original code path
 was replaced; request a split or prior design discussion; or advance to
 engineering review. A useful sub-change in an otherwise rejected PR
 is a lead to verify independently, not a reason to keep the PR open.
+
+### Engineering review handoff
+
+Gate 5 is one handoff, not a second independent review:
+
+1. Invoke `inventory-review` once, before taking the engineering-review action.
+2. Give it the PR diff as it applies to the current `main` snapshot, plus the
+   purpose and evidence already established at Gates 1–4.
+3. Add its inventory, checks, findings, and boundary-test results to this PR's
+   evidence record.
+4. Resume this skill to choose and take the disposition: approve or merge when
+   there are no blockers and authority permits it; request changes for blockers;
+   or take the smallest safe step that advances the PR.
+
+`inventory-review` is read-only discovery. This skill still owns the GitHub
+action and contributor communication. Do not run a second inventory pass merely
+to confirm the first; repeat it only when the reviewed diff or a relevant
+`main` contract changed.
 
 ## Evidence record
 
