@@ -15,6 +15,10 @@ evidence records for completeness, verifies remote outcomes once, and cleans up.
 
 ## Batch contract
 
+A batch reviews PRs against one target branch. Read each PR's target branch
+(GitHub `baseRefName`) first, and split PRs with different repositories or
+target branches into separate batches.
+
 Before creating anything, choose a deterministic per-repository parent beneath
 the system temporary directory. Check it for incomplete ledgers from earlier
 batches and finish or report their cleanup before starting another batch. Then
@@ -22,23 +26,28 @@ create a unique batch directory and persist a resource ledger inside it. Update
 the ledger immediately after every acquisition or release so a resumed driver
 can clean a partially created batch. Record:
 
-- repository owner/name, repository root, remote, and base branch;
+- repository owner/name, repository root, remote, and target branch;
 - the original checkout's branch or detached `HEAD`, commit SHA, and exact file
   status before the batch;
-- one freshly fetched base SHA shared by the whole batch;
+- the pinned base SHA shared by the whole batch;
 - the PR numbers, head SHAs, temporary refs, worktree paths, agent IDs, and run
   IDs in a resource ledger;
 - the authenticated GitHub identity and its authority to review, close, or merge.
 
-The fetched base SHA is the batch's consistency boundary. Every reviewer tests
-and cites that snapshot even if `main` moves during the batch.
+The pinned base SHA is the current remote tip of the target branch, fetched at
+batch start — never a PR's merge base, its historical branch point, or an
+unfetched remote-tracking ref. An old PR is reviewed against the target branch
+as it is today, not as it was when the PR was written. That SHA is the batch's
+consistency boundary: every reviewer tests and cites that snapshot even if the
+target branch moves during the batch.
 
 ## Create isolated worktrees
 
 The driver creates and owns one detached worktree per PR. Subagents never create,
 remove, or reuse worktrees.
 
-1. Fetch the base branch once and resolve its SHA.
+1. Fetch the target branch from its remote once and resolve its tip as the
+   pinned base SHA.
 2. Fetch each pull-request head into a batch-specific temporary ref. Record the
    exact head SHA; do not rely on a mutable contributor branch name.
 3. Add each worktree detached at the pinned base SHA. Use paths containing the
@@ -76,8 +85,10 @@ Each assignment must require the reviewer to:
 5. Immediately before any GitHub action, re-read the PR's remote head SHA. If it
    differs from the recorded head, do not act on the stale review: update the
    ledger and worktree, then review the changed diff before choosing a
-   disposition. Also re-read the existing reviews/comments so a retry or another
-   reviewer cannot cause a duplicate action.
+   disposition. Re-read the PR's target branch too: a retargeted PR invalidates
+   the batch snapshot, so escalate for a rebuilt review against the new target
+   instead of acting. Also re-read the existing reviews/comments so a retry or
+   another reviewer cannot cause a duplicate action.
 6. Verify every GitHub action and how its communication rendered.
 7. Return exactly one structured evidence record:
 
@@ -134,7 +145,7 @@ After all agents finish:
 2. Batch-fetch the final state, review decision, head SHA, and posted review or
    comment for every PR. Confirm the text rendered correctly and no duplicate
    action was posted.
-3. Fetch the base branch once more. If it moved, inspect only the intervening
+3. Fetch the target branch once more. If it moved, inspect only the intervening
    diff for overlap with each PR's changed contracts, successor paths, or
    decisive evidence. Reopen a review only when that delta can change its
    disposition; a moving branch alone is not a reason to repeat every review.
@@ -164,5 +175,6 @@ batch as complete while an owned worktree, ref, run, or subagent remains.
 ## Final report
 
 Summarize each PR's decisive gate, disposition, action link, and final remote
-state. State the pinned base SHA and whether `main` moved relevantly. Confirm
-resource cleanup and whether the user's checkout remained unchanged.
+state. State the pinned base SHA and whether the target branch moved
+relevantly. Confirm resource cleanup and whether the user's checkout remained
+unchanged.
