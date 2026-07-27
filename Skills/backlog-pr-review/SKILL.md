@@ -69,6 +69,35 @@ to confirm the first; repeat it only when the reviewed diff or a relevant
 `main` contract changed. Gate 5 is an additional invocation context for
 `inventory-review`; it does not replace that skill's pre-PR development review.
 
+### Contributor-facing communication
+
+Before posting a review, change request, or closure, apply the active
+`big-boss-groove` guidance under **Writing → Tone**, **The Pyramid Principle**,
+and **Edit Line by Line**. The evidence record is internal reviewer material,
+not a draft for the contributor.
+
+Rewrite the evidence for the person who did the work:
+
+1. Lead with the answer and path forward: what is ready, what remains, and what
+   concrete change moves the PR forward.
+2. Recognize useful work already done. Thank external and first-time
+   contributors, and add encouragement appropriate to the relationship.
+3. Explain the reason in ordinary project language, using the relevant
+   behavior, file, job, command, or user case.
+4. End with a clear, achievable next step or a genuine path to disagree.
+
+Do not leak `inventory-review` process vocabulary into public text. Translate
+terms such as "inventory item," "failed check," "invariant," "consistency
+boundary," or "boundary test" into the specific situation the contributor
+recognizes. For example, write "the current checks run after a PR leaves draft
+mode," not "the checks do not cover the draft boundary." Technical terms that
+belong to the code or product are fine; unexplained reviewer-framework jargon
+is not.
+
+Before posting, read the message once as the contributor. It should feel like
+help from a teammate who wants the contribution to succeed, not an internal
+audit report addressed to its subject.
+
 ## Evidence record
 
 For each PR, keep a record of the decisive gate, the disposition, and the
@@ -212,6 +241,11 @@ Before posting, lint the draft against the evidence record:
   record both checks.
 - Do not post duplicate comments when a batch command times out; re-read remote
   state before resuming.
+- Treat a successful review submission as durable. Capture the returned review
+  ID and read that review directly before retrying; list and timeline reads may
+  be stale. Submitted reviews cannot be deleted, and dismissal leaves a visible
+  event in the PR timeline. Correct the existing review body in place when the
+  API permits it instead of dismissing the review and posting a replacement.
 - When closure rests on an obsolete implementation, check whether the old code
   is still present but unused on `main`. Record it for a separate deletion
   follow-up; do not mix that cleanup into the closure decision.

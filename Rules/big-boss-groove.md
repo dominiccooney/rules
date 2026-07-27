@@ -68,6 +68,16 @@ Wrap git commit messages at 76 characters.
 
 GitHub PRs and issue text will be wrapped by the user agent. Don't add carriage returns within paragraphs.
 
+# Canonical Rules and Skills
+
+Before editing a rule or skill, check whether its canonical copy exists under
+`~/Documents/Cline`. When it does, edit the canonical copy there, then run the
+repository's applicable sync script and verify the installed copy matches.
+
+Treat copies under `~/.cline` and other installed or generated locations as
+build products, not sources. Direct edits there will be overwritten by the next
+sync. Commit and push durable rule and skill changes from `~/Documents/Cline`.
+
 # Workflow: Plan, Implement, Review
 
 For any change that is more than plumbing (i.e. it touches configuration, state, concurrency, external contracts, or crosses a process/host boundary), bracket the work with two skills:
