@@ -45,6 +45,14 @@ Enumerate, citing file:line for each item:
    registration inside mutating procedures.
 6. **External contracts consumed**: schemas, runtime APIs, executables,
    packaging assumptions.
+7. **Caller-inherited obligations**: for every procedure the diff adds an
+   exit to (early return, throw, new branch), the state its CALLERS establish
+   before delegating — phases, spinners, pending flags, locks, pre-emitted
+   UI. Read the callback/option doc comments in the touched file: an
+   obligation documented on one callback (e.g. "the failure must move the
+   phase to terminal") binds every sibling exit, not just the annotated one.
+8. **Declared consistency boundaries**: every mutex, queue, or "X and Y are
+   serialized" invariant the diff introduces or relies on.
 
 ## Step 2 — Apply the per-type checks
 
@@ -85,6 +93,24 @@ API? Dependency present in the shipped artifact? Executable exists in the
 host (not guest) environment? Tests cross the real boundary rather than
 re-implementing the invariant in a stub?
 
+**Caller-inherited obligations → exit-inheritance check.** Add every
+caller-established state to the exit/lifecycle table alongside resources the
+procedure creates itself. A NEW exit added by the diff inherits the full
+settlement obligation of the exits that preceded it; "return early" is a
+settlement decision, not an absence of one.
+
+**Declared boundaries → resource-rooted enrollment.** Enumerate participants
+from the PROTECTED RESOURCE, not from the diff: grep for every reader and
+writer of the protected state and either enroll each in the boundary or
+record an explicit, justified exemption. An unenrolled writer silently voids
+the invariant — and every review conclusion that leaned on it. Then check
+each identity recheck inside the boundary against its purpose: object
+identity for ownership/cleanup ("never touch a resource someone else now
+owns"); logical identity (an ID that rebuilds deliberately reuse) for
+targeting continuing work at the same conversation/task. Using object
+identity for targeting makes legitimate rebuilds silently cancel work;
+using logical identity for cleanup makes you destroy a successor.
+
 ## Step 3 — Findings and triage
 
 Each finding cites its inventory item and failed check, plus: concrete
@@ -122,7 +148,15 @@ Triage each finding:
 Apply the **smallest sufficient response** to blockers. Do not recommend
 broad refactoring unless a blocker cannot be fixed locally.
 
-## Step 4 — Residual pass (optional, usually empty)
+## Step 4 — Re-inventory after fixes
+
+Fixes are diffs too. Each round of fixes introduces new exits, new locks,
+new callbacks — each with its own inherited obligations and boundary
+enrollment. Before resubmitting, run steps 1–3 over the fix delta itself
+(usually a minutes-long pass, not a full re-review). Do not only re-verify
+the original findings.
+
+## Step 5 — Residual pass (optional, usually empty)
 
 One short free-form pass: "anything cross-cutting the inventory missed?"
 Expected answer: nothing. Do not pad.
