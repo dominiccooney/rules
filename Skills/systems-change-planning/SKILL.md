@@ -25,11 +25,47 @@ stop — a one-line plan is a valid output.
    - a single shared resolver both readers call
    - a snapshot type whose fields travel together
    - a state machine with explicit transitions
-   - a declared consistency boundary (see step 3)
+   - a declared consistency boundary (see step 4)
 4. **State the invariants** the structure establishes, one sentence each.
 5. **List non-goals explicitly.** These bound both implementation and review.
 
-## Step 2 — Derive the plan from the change (not from brainstorming)
+## Step 2 — Reuse, or split; do not bypass
+
+When the change needs "what an existing path does, but different in one
+respect," the default is to go THROUGH the existing path. A battle-hardened
+path is an accumulation point for every invariant anyone has learned about
+that operation — ordering guards, pending-work waits, policy wiring. Routing
+around it silently discards fixes you do not know exist, and no checklist
+enumerates unknown fixes.
+
+Escalate in order; stop at the first that fits:
+
+1. **Reuse as-is** — the difference is expressible with existing parameters.
+2. **Parameterize** — add an option, if it stays one orthogonal option and
+   not the next entry in a growing flag set.
+3. **Split along a concept** — divide the path into a shared core that keeps
+   ALL the accreted invariants and a divergent part holding only the new
+   decision. Choose the concept so the invariants land entirely in the shared
+   half; if a candidate split scatters them across both halves, the concept
+   is wrong. Mechanisms, smallest first:
+   - **Extracted core function** both callers call. Usually sufficient.
+   - **Template Method** when the SEQUENCE is the invariant (stop-before-
+     start, check-then-write ordering) and only individual steps vary.
+   - **Strategy** when the divergence is a coherent, swappable responsibility
+     (who owns the resulting resource, where results register) — also the
+     tool for consolidating a conditional spread across the codebase into one
+     construction site.
+   A Strategy with one production implementation is a parameterization
+   wearing a costume; prefer the smaller mechanism.
+4. **Bypass** — only when the paths truly share nothing but a name. Then
+   inventory the bypassed path FIRST: read it guard by guard and record in
+   the plan why each guard does not apply to the bypass. "I did not know that
+   guard existed" is the failure mode this step exists to prevent.
+
+A bypass that needs repeated patching to become safe is evidence the
+boundary was wrong; return here and split instead.
+
+## Step 3 — Derive the plan from the change (not from brainstorming)
 
 Answer only the questions raised by boundaries the change actually touches:
 
@@ -47,7 +83,7 @@ runtime version, config source, artifact) combination that actually executes
 the changed path. Rows that are unsupported get an explicit "unsupported"
 entry, never a silent assumption of the dev environment.
 
-## Step 3 — Declare the consistency boundary
+## Step 4 — Declare the consistency boundary
 
 For every mutable setting or dependency involved, state exactly when a change
 becomes effective: immediately / next tool call / next model request / next
@@ -55,7 +91,7 @@ turn / next session / next restart. All values that must agree transition at
 that same boundary. Write the boundary as one sentence in the plan and later
 in a code comment.
 
-## Step 4 — Plan tests at the boundary where risk lives
+## Step 5 — Plan tests at the boundary where risk lives
 
 | Risk | Test at |
 |---|---|
@@ -65,14 +101,14 @@ in a code comment.
 | Config transition | change the setting immediately before AND immediately after the declared boundary |
 | Cross-module behavior | integration through the real callers — never a stub that re-implements the invariant |
 
-## Step 5 — Decide refactor-first
+## Step 6 — Decide refactor-first
 
 If implementing the model forces touching code for reasons OTHER than the
 behavior change, split a preparatory refactor into its own commit/PR ("make
 the change easy, then make the easy change"). If the change is already local,
 skip — a mandatory prep-refactor is its own form of scope creep.
 
-## Step 6 — Draft the PR description skeleton
+## Step 7 — Draft the PR description skeleton
 
 Sketch the eventual PR description now, with gaps: the Situation/Complication/
 Answer introduction (the Answer is the central promise from step 1) and the
@@ -83,6 +119,7 @@ dozen lines; this is a sketch to complete at PR time, not a PRFAQ.
 ## Output format
 
 A plan of roughly one page: promise, essential complexity, chosen structure,
+reuse-or-split decision (with bypassed-guard inventory if bypassing),
 invariants (numbered), consistency boundary, boundary matrix, test plan,
 non-goals, refactor-first decision, PR skeleton. Then implement in the order:
 model → API → tests-on-the-real-implementation → wiring.
