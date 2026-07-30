@@ -1,6 +1,6 @@
 ---
 name: backlog-pr-review
-description: Triage a pull-request backlog methodically, decide whether to close or advance each PR, and write concise, respectful reviewer communication. Use for backlog sweeps and closure-message drafting. Invokes inventory-review for implementation correctness when a PR reaches engineering review.
+description: Triage a pull-request backlog methodically, decide whether to close or advance each PR, and write concise, respectful reviewer communication. Use for external-contributor PRs, PRs roughly two weeks old or older from anyone, and closure-message drafting; fresh colleague PRs get a spot review instead. Invokes inventory-review for implementation correctness when a PR reaches engineering review.
 ---
 
 # Backlog PR Review
@@ -20,6 +20,19 @@ sweeps, never the deliverable.
 Each sweep item follows the same sequence: triage through the gates, record the
 evidence and disposition, act on the disposition, then communicate. Later steps
 draw only on the record built by earlier ones.
+
+## When this skill applies
+
+Apply this skill to PRs from external contributors, and to PRs roughly two
+weeks old or older from anyone. Those PRs need the staged triage below because
+time and distance make cheap dispositions — superseded, obsolete, duplicated —
+likely.
+
+A fresh PR from a colleague, reviewed on request, is a **spot review**, not a
+backlog item. Skip this skill's triage and disposition machinery: review the
+change directly with the software-engineering and design rules and skills
+(`inventory-review` on the diff, the active writing guidance for the review
+text).
 
 ## Stepped triage
 
@@ -49,6 +62,25 @@ obsolete, or out of direction; retarget a live fix whose original code path
 was replaced; request a split or prior design discussion; or advance to
 engineering review. A useful sub-change in an otherwise rejected PR
 is a lead to verify independently, not a reason to keep the PR open.
+
+### Closing on direction
+
+When the direction could plausibly be right, "this requires discussion /
+design input / security review" is not a complete closure — it shuts the
+contributor down without giving them a move. Respect the contribution, keep
+the change moving, and be transparent: invite them to file a GitHub issue
+with the proposal for discussion, or to reach the team on Discord. Routing
+the idea to the right forum is the state change; the closure alone is not.
+
+Before drafting that invitation, check the PR for a linked issue. The
+contributor may already have done exactly what you are about to ask:
+
+- If they filed an issue and no Cline member engaged with it, acknowledge
+  that and apologize — never tell them to open the issue they already opened.
+  Engage with the existing issue, or explain plainly why the proposal will
+  not proceed.
+- If the issue got a response that the PR does not reflect, cite that
+  discussion in the closure.
 
 ### Engineering review handoff
 
@@ -93,6 +125,12 @@ recognizes. For example, write "the current checks run after a PR leaves draft
 mode," not "the checks do not cover the draft boundary." Technical terms that
 belong to the code or product are fine; unexplained reviewer-framework jargon
 is not.
+
+Be specific about deleted or replaced code. Vagaries like "the live path" or
+"the current implementation" give the contributor nothing to search for.
+Succinctly name the most relevant component — the function, file, or
+subsystem — or, failing a good name, describe it concretely enough that the
+contributor can find it and adapt their change to the new code.
 
 Before posting, read the message once as the contributor. It should feel like
 help from a teammate who wants the contribution to succeed, not an internal
@@ -247,8 +285,10 @@ Before posting, lint the draft against the evidence record:
   event in the PR timeline. Correct the existing review body in place when the
   API permits it instead of dismissing the review and posting a replacement.
 - When closure rests on an obsolete implementation, check whether the old code
-  is still present but unused on `main`. Record it for a separate deletion
-  follow-up; do not mix that cleanup into the closure decision.
+  is still present but unused on `main`. Record the dead code in the sweep
+  record; do not mix that cleanup into the closure decision. At the end of the
+  batch, collect these notes into one omnibus PR that deletes the dead code,
+  and link in it the reviews where each dead path was detected.
 - Post comments with real characters, not escape sequences: `gh` CLI `-f`/`-F`
   string fields do not interpret `\n` or `\uXXXX`. Write the message to a file
   and pass `-F body=@file`.
