@@ -102,8 +102,8 @@ On every invocation:
 For the active item:
 
 1. Fetch its target branch and PR head into temporary refs. Review against the target branch's current remote tip when this item starts. Run `update` immediately after acquiring resources.
-2. Invoke `backlog-pr-review` in this conversation. Gates 1–4 build one shared purpose/current-main evidence record.
-3. If the PR reaches Gate 5, invoke `inventory-review` **once in this same conversation**, passing the integrated diff plus the Gates 1–4 record. Append its inventory, checks, findings, and boundary-test results to the same record. Resume `backlog-pr-review` for disposition and action. This is one review with an internal Gate 5 handoff—not a second independent review, subagent report, or repeated inventory pass.
+2. Invoke `backlog-pr-review` in this conversation. Gates 1–5 build one shared purpose/current-main evidence record, including upstream ownership and any required product clearance.
+3. If the PR reaches Gate 6, invoke `inventory-review` **once in this same conversation**, passing the integrated diff plus the Gates 1–5 record. Append its inventory, checks, findings, and boundary-test results to the same record. Resume `backlog-pr-review` for disposition and action. This is one review with an internal Gate 6 handoff—not a second independent review, subagent report, or repeated inventory pass.
 4. Before any GitHub mutation, run `update` with the exact planned action. Re-read the current head, state, reviews, comments, and target branch. Rebuild affected evidence if relevant state changed.
 5. Take the evidence-backed action allowed by the user's authority. Verify the remote result and rendered communication, then run `update` immediately. Never repeat an action merely because a local command timed out.
 6. Remove the worktree and refs, then run `update --clear-resources`. Run `done` only after the remote outcome and cleanup are verified; run `wait` when progress depends on an external event or decision.

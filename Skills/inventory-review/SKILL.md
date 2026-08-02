@@ -18,7 +18,7 @@ This skill has two independent entry points:
    opening or updating a PR. Fix or explicitly triage its blockers before
    submission.
 2. **Existing-PR engineering review:** `backlog-pr-review` invokes it when a
-   contributor PR survives Gates 1–4. Return the findings to that workflow,
+   contributor PR survives Gates 1–5. Return the findings to that workflow,
    which owns the review action and contributor communication.
 
 The backlog-review entry point supplements rather than replaces pre-PR review.

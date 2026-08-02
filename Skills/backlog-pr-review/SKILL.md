@@ -50,10 +50,19 @@ Stop at the first decisive gate:
 3. **Purpose and hygiene:** Is the intended outcome focused and understandable?
    Is there enough issue/reproduction/context to evaluate it? Scale hygiene
    expectations with scope.
-4. **Product direction:** If it worked exactly as described, would Cline want
-   the behavior? For unapproved cross-product policy or architecture, redirect
-   to discussion rather than reviewing a large implementation.
-5. **Engineering review:** If the PR survives, invoke the `inventory-review`
+4. **Ownership boundary:** Is `cline/cline` the right place to own the behavior?
+   For provider-specific wire formats, runtime shims, schemas, model facts, and
+   other external contracts, check whether the durable fix belongs in the
+   service itself or an upstream dependency. A local compatibility shim can be
+   appropriate, but only after recording why Cline should carry that external
+   contract instead of fixing or extending its authoritative owner.
+5. **Product direction and clearance:** If it worked exactly as described,
+   would Cline want the behavior? For unapproved cross-product policy or
+   architecture, redirect to discussion rather than reviewing a large
+   implementation. Changes with commercial intent or competitive relevance
+   require internal clearance before GitHub approval or merge, even when the
+   engineering review supports approval.
+6. **Engineering review:** If the PR survives, invoke the `inventory-review`
    skill against the PR integrated with the current `main` snapshot. Do not
    recreate its caller, contract, concurrency, UI, or testing checks here.
 
@@ -82,13 +91,70 @@ contributor may already have done exactly what you are about to ask:
 - If the issue got a response that the PR does not reflect, cite that
   discussion in the closure.
 
+### Commercial and competitive clearance
+
+Treat a change as commercially or competitively relevant when it could grant
+or imply first-class product placement, endorse or disadvantage a third party,
+change marketplace or provider exposure, create a strategic integration, or
+otherwise affect how Cline competes or partners. This is a product-clearance
+question, not an engineering-severity label.
+
+- The review may conclude in chat or in the evidence record that the change is
+  technically ready and **recommend** approval.
+- Do not submit an approving GitHub review or merge until the relevant internal
+  product owner has cleared the direction. GitHub approval conflates engineering
+  readiness with a public product decision, so repository write authority alone
+  is not clearance.
+- Keep internal commercial reasoning internal. Contributor-facing text may say
+  that product direction is not yet decided and name the public decision needed;
+  it must not speculate about competitors, partnerships, or private strategy.
+
+For a significant product-direction change from a third-party contributor,
+look for a linked feature request or discussion and read it in full. Approval
+requires an unequivocally supportive response from a Cline member with authority
+over that product area; an open thread, silence, a bot response, implementation
+feedback, or support from another external contributor is not approval. If that
+support is absent:
+
+1. do not approve the PR on GitHub automatically;
+2. record the missing product decision and the linked discussion in the review
+   evidence;
+3. leave the PR waiting when an internal decision can unblock it; and
+4. in the review summary, recommend the smallest concrete internal action that
+   moves the decision forward — for example, ask the named product owner to
+   answer the existing discussion, identify the acceptance criteria, or decide
+   whether Cline wants to own the integration.
+
+Do not send the contributor in circles. If they already opened the required
+discussion, the next step belongs to Cline, not to them.
+
+### Upstream ownership
+
+Review the ownership boundary beyond `cline/cline`, not merely across files in
+this repository. Ask which system has the freshest authoritative knowledge and
+can fix the behavior for every consumer:
+
+- a service should usually own normalization of its own public API;
+- a provider-specific SDK or adapter should usually own its nonstandard wire
+  format;
+- a general dependency should own behavior that is part of its declared
+  cross-provider contract; and
+- Cline should own its product policy, abstract request intent, and genuine
+  Cline-specific compatibility behavior.
+
+When upstream is the durable owner, prefer an upstream fix or extension. A
+local shim needs explicit evidence that upstream cannot address the need in the
+required timeframe, that Cline intentionally accepts the maintenance burden,
+and that the shim has a clear contract boundary. Do not move vendor-specific
+guesses into a generic dependency merely to move them out of this repository.
+
 ### Engineering review handoff
 
-Gate 5 is one handoff, not a second independent review:
+Gate 6 is one handoff, not a second independent review:
 
 1. Invoke `inventory-review` once, before taking the engineering-review action.
 2. Give it the PR diff as it applies to the current `main` snapshot, plus the
-   purpose and evidence already established at Gates 1–4.
+   purpose and evidence already established at Gates 1–5.
 3. Add its inventory, checks, findings, and boundary-test results to this PR's
    evidence record.
 4. Resume this skill to choose and take the disposition: approve or merge when
@@ -98,7 +164,7 @@ Gate 5 is one handoff, not a second independent review:
 `inventory-review` is read-only discovery. This skill still owns the GitHub
 action and contributor communication. Do not run a second inventory pass merely
 to confirm the first; repeat it only when the reviewed diff or a relevant
-`main` contract changed. Gate 5 is an additional invocation context for
+`main` contract changed. Gate 6 is an additional invocation context for
 `inventory-review`; it does not replace that skill's pre-PR development review.
 
 ### Contributor-facing communication
