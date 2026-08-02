@@ -50,14 +50,14 @@ Stop at the first decisive gate:
 3. **Purpose and hygiene:** Is the intended outcome focused and understandable?
    Is there enough issue/reproduction/context to evaluate it? Scale hygiene
    expectations with scope.
-4. **Ownership boundary:** Is `cline/cline` the right place to own the behavior?
-   For provider-specific wire formats, runtime shims, schemas, model facts, and
-   other external contracts, check whether the durable fix belongs in the
-   service itself or an upstream dependency. A local compatibility shim can be
-   appropriate, but only after recording why Cline should carry that external
-   contract instead of fixing or extending its authoritative owner.
+4. **Ownership boundary:** Is this repository the right home for the behavior?
+   For vendor-specific wire formats, runtime shims, schemas, and other external
+   contracts, check whether the durable fix belongs in the external service
+   itself or an upstream dependency. A local compatibility shim can be
+   appropriate, but only after recording why this project should carry that
+   external contract instead of fixing or extending its authoritative owner.
 5. **Product direction and clearance:** If it worked exactly as described,
-   would Cline want the behavior? For unapproved cross-product policy or
+   would the project want the behavior? For unapproved cross-product policy or
    architecture, redirect to discussion rather than reviewing a large
    implementation. Changes with commercial intent or competitive relevance
    require internal clearance before GitHub approval or merge, even when the
@@ -78,13 +78,14 @@ When the direction could plausibly be right, "this requires discussion /
 design input / security review" is not a complete closure — it shuts the
 contributor down without giving them a move. Respect the contribution, keep
 the change moving, and be transparent: invite them to file a GitHub issue
-with the proposal for discussion, or to reach the team on Discord. Routing
-the idea to the right forum is the state change; the closure alone is not.
+with the proposal for discussion, or to reach the team through the project's
+community channel. Routing the idea to the right forum is the state change;
+the closure alone is not.
 
 Before drafting that invitation, check the PR for a linked issue. The
 contributor may already have done exactly what you are about to ask:
 
-- If they filed an issue and no Cline member engaged with it, acknowledge
+- If they filed an issue and no maintainer engaged with it, acknowledge
   that and apologize — never tell them to open the issue they already opened.
   Engage with the existing issue, or explain plainly why the proposal will
   not proceed.
@@ -95,23 +96,23 @@ contributor may already have done exactly what you are about to ask:
 
 Treat a change as commercially or competitively relevant when it could grant
 or imply first-class product placement, endorse or disadvantage a third party,
-change marketplace or provider exposure, create a strategic integration, or
-otherwise affect how Cline competes or partners. This is a product-clearance
-question, not an engineering-severity label.
+change marketplace or vendor exposure, create a strategic integration, or
+otherwise affect how the project competes or partners. This is a
+product-clearance question, not an engineering-severity label.
 
 - The review may conclude in chat or in the evidence record that the change is
   technically ready and **recommend** approval.
-- Do not submit an approving GitHub review or merge until the relevant internal
-  product owner has cleared the direction. GitHub approval conflates engineering
-  readiness with a public product decision, so repository write authority alone
-  is not clearance.
+- Do not submit an approving GitHub review or merge until a maintainer with
+  product authority has cleared the direction. GitHub approval conflates
+  engineering readiness with a public product decision, so repository write
+  authority alone is not clearance.
 - Keep internal commercial reasoning internal. Contributor-facing text may say
   that product direction is not yet decided and name the public decision needed;
   it must not speculate about competitors, partnerships, or private strategy.
 
 For a significant product-direction change from a third-party contributor,
 look for a linked feature request or discussion and read it in full. Approval
-requires an unequivocally supportive response from a Cline member with authority
+requires an unequivocally supportive response from a maintainer with authority
 over that product area; an open thread, silence, a bot response, implementation
 feedback, or support from another external contributor is not approval. If that
 support is absent:
@@ -121,32 +122,33 @@ support is absent:
    evidence;
 3. leave the PR waiting when an internal decision can unblock it; and
 4. in the review summary, recommend the smallest concrete internal action that
-   moves the decision forward — for example, ask the named product owner to
+   moves the decision forward — for example, ask the responsible maintainer to
    answer the existing discussion, identify the acceptance criteria, or decide
-   whether Cline wants to own the integration.
+   whether the project wants to own the integration.
 
 Do not send the contributor in circles. If they already opened the required
-discussion, the next step belongs to Cline, not to them.
+discussion, the next step belongs to the maintainers, not to them.
 
 ### Upstream ownership
 
-Review the ownership boundary beyond `cline/cline`, not merely across files in
-this repository. Ask which system has the freshest authoritative knowledge and
-can fix the behavior for every consumer:
+Review the ownership boundary beyond this repository, not merely across files
+inside it. Ask which system has the freshest authoritative knowledge and can
+fix the behavior for every consumer:
 
-- a service should usually own normalization of its own public API;
-- a provider-specific SDK or adapter should usually own its nonstandard wire
-  format;
-- a general dependency should own behavior that is part of its declared
-  cross-provider contract; and
-- Cline should own its product policy, abstract request intent, and genuine
-  Cline-specific compatibility behavior.
+- an external service should usually own normalization of its own public API;
+- a vendor-specific SDK or adapter should usually own that vendor's
+  nonstandard wire format;
+- a general-purpose dependency should own behavior that is part of its
+  declared cross-vendor contract; and
+- this repository should own its product policy, its abstract request intent,
+  and compatibility behavior genuinely specific to this project.
 
 When upstream is the durable owner, prefer an upstream fix or extension. A
-local shim needs explicit evidence that upstream cannot address the need in the
-required timeframe, that Cline intentionally accepts the maintenance burden,
-and that the shim has a clear contract boundary. Do not move vendor-specific
-guesses into a generic dependency merely to move them out of this repository.
+local shim needs explicit evidence that upstream cannot address the need in
+the required timeframe, that the project intentionally accepts the maintenance
+burden, and that the shim has a clear contract boundary. Do not move
+vendor-specific guesses into a generic dependency merely to move them out of
+this repository.
 
 ### Engineering review handoff
 
@@ -169,10 +171,9 @@ to confirm the first; repeat it only when the reviewed diff or a relevant
 
 ### Contributor-facing communication
 
-Before posting a review, change request, or closure, apply the active
-`big-boss-groove` guidance under **Writing → Tone**, **The Pyramid Principle**,
-and **Edit Line by Line**. The evidence record is internal reviewer material,
-not a draft for the contributor.
+Before posting a review, change request, or closure, apply the active writing
+rules: tone, the Pyramid Principle, and line-by-line editing. The evidence
+record is internal reviewer material, not a draft for the contributor.
 
 Rewrite the evidence for the person who did the work:
 
@@ -306,7 +307,7 @@ usually benefit from a direct sentence or two.
 For **external or new contributors**, add one or two sentences that:
 
 - thank them for the contribution;
-- apologize for a slow response when no Cline member responded for an extended
+- apologize for a slow response when no maintainer responded for an extended
   period — check the thread first, and do not imply the contributor caused the
   delay;
 - welcome future contributions, even when this PR cannot move forward.

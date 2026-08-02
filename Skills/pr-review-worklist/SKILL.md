@@ -28,6 +28,11 @@ $HOME/.cline/pr-review-worklist.json
 
 On Windows it is `$env:USERPROFILE\.cline\pr-review-worklist.json`.
 
+The `.cline` segment in the paths and ref namespaces throughout this skill is
+the host agent's data directory. This is the only host-specific detail in
+these review skills; on another agent, substitute its data directory while
+keeping the names stable, because resume depends on finding the same paths.
+
 JSON is the source of truth because the main consumer is an agent and state transitions are easier to validate structurally than through Markdown edits. The ordered `items` array preserves queue order. Each item carries exactly one `state`: `todo`, `in_progress`, `waiting`, or `done`.
 
 Use the bundled standard-library CLI for all routine mutations:
@@ -48,13 +53,13 @@ python3 "$WL" init
 python3 "$WL" validate
 python3 "$WL" summary --json
 
-python3 "$WL" add --repo cline/cline --number 123 \
+python3 "$WL" add --repo owner/repo --number 123 \
   --title "Short purpose" --opened 2026-07-01
 
 python3 "$WL" start \
   --next-step "Read live PR metadata, reviews, comments, and repository state"
 
-python3 "$WL" update --pr cline/cline#123 \
+python3 "$WL" update --pr owner/repo#123 \
   --note "live metadata and immutable refs verified" \
   --target-branch main --base FULL_BASE_SHA --head FULL_HEAD_SHA \
   --next-step "Apply the backlog review gates" \
@@ -62,17 +67,17 @@ python3 "$WL" update --pr cline/cline#123 \
   --resource 'ref refs/cline-pr-review/main' \
   --resource 'ref refs/cline-pr-review/pr-123'
 
-python3 "$WL" wait --pr cline/cline#123 --note "review paused" \
+python3 "$WL" wait --pr owner/repo#123 --note "review paused" \
   --waiting-for "contributor update" --recheck-when "the head SHA changes" \
   --next-step "Read the changed diff" --evidence "Requested one focused change"
 
-python3 "$WL" start --pr cline/cline#123 --note "head changed" \
+python3 "$WL" start --pr owner/repo#123 --note "head changed" \
   --next-step "Verify the new head before acting"
 
-python3 "$WL" update --pr cline/cline#123 \
+python3 "$WL" update --pr owner/repo#123 \
   --note "owned refs and worktree removed" --clear-resources
 
-python3 "$WL" done --pr cline/cline#123 \
+python3 "$WL" done --pr owner/repo#123 \
   --note "remote outcome and cleanup verified" \
   --outcome "Gate 2 — superseded" --evidence "Merged #456 covers the behavior" \
   --action "Commented and closed — ACTION_URL" \
