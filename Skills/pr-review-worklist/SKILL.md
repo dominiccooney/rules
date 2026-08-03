@@ -119,4 +119,14 @@ Use at most one isolated worktree. Prefer `$HOME/.cline/pr-review-worktrees/<own
 
 Prefer stopping with no `in_progress` item. If interruption is unavoidable, run `update` with the last verified observation, exact next step, base/head SHAs, and every owned resource. Never delete the worklist.
 
-Report the processed PR, resulting state, action link if any, and `summary --json` counts. If nothing is eligible, report the waiting conditions rather than polling or spawning workers.
+Report processed PRs by **actions taken by this reviewer**, following
+`backlog-pr-review`'s action-attribution categories. The worklist's `action`
+field records this reviewer's verified remote mutations; `verifiedRemoteState`
+records the PR outcome and may include actions taken later by other people.
+Never collapse those two facts. Name the actor when another person approved,
+merged, closed, or updated the PR.
+
+Include action links, separately attributed remote outcomes, and
+`summary --json` counts. Do not use the internal `done` state as a reader-facing
+category. If nothing is eligible, report the waiting conditions rather than
+polling or spawning workers.

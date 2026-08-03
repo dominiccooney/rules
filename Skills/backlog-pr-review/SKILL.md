@@ -335,6 +335,31 @@ Before posting, lint the draft against the evidence record:
   defend.
 - **The disposition in the message matches the disposition in the record.**
 
+## Sweep reporting and action attribution
+
+Report a sweep primarily by the actions **this reviewer took**, not by the
+PR's eventual state. This is the reader's direct-risk view of the work. Group
+items under explicit reviewer-action categories such as:
+
+- approved by this reviewer;
+- changes requested by this reviewer;
+- branch or PR text updated/pushed by this reviewer;
+- commented on and closed by this reviewer;
+- no remote action — already resolved; or
+- no remote action — waiting on a contributor, maintainer decision, or CI.
+
+Report remote outcomes in a separate field or sentence, with the actor named.
+For example: "Updated and pushed by this reviewer; later approved and merged by
+@maintainer." Never summarize that item as "approved and merged" without first
+making clear that this reviewer did neither action.
+
+List every material GitHub mutation this reviewer performed; do not let a later
+remote outcome erase an earlier request-changes review, branch update, comment,
+closure, or approval. Conversely, reading, verification, and local testing are
+not remote actions. Internal worklist states such as `done` are bookkeeping,
+not reporting categories, and must never be presented as if they describe the
+reviewer's action.
+
 ## Backlog sweep safeguards
 
 - Never close solely because a PR is old, conflicting, or lacks tests.
