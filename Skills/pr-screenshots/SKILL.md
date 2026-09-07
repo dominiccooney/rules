@@ -66,7 +66,3 @@ If the implementation changes, keep the old evidence labelled with its tested re
 - Keep `dpc/pr-evidence` long-lived and append-only; no routine pruning or force-push compaction. Git is suitable for selected screenshots, not a video archive. If storage becomes a problem, agree a durable artifact migration and link-retention plan first.
 - Do not delete existing per-PR screenshot branches as part of an upload. Older descriptions/comments may use branch-relative URLs. Inventory inbound references and migrate/verify them separately with authorization before considering retirement; never assume a deleted branch's unreachable objects remain hosted.
 - Report product PR, tested source SHA, evidence SHA, immutable image URL, what was actually verified, and remaining caveats. No screenshot-only PR is needed or wanted.
-
-## Local installation
-
-Canonical source: `Documents/Cline/Skills/pr-screenshots` in the rules repository. After pulling it on Linux/macOS, run `Documents/Cline/Scripts/sync-skills.sh`; on Windows, run `Documents\Cline\Scripts\sync-skills.ps1`. The task-start hooks also run these scripts. Installed copies under `.cline/skills` are generated; edit and commit the canonical source only. An already-running agent may need the canonical file supplied explicitly or a new session to see updated instructions.
