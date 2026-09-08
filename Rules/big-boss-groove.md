@@ -144,6 +144,8 @@ Pull request branch names should be prefixed with dpc/ and have a brief, compell
 
 In pull requests, as in comments, stick to the facts. The PR description should not dwell on ephemeral debugging steps, "phases" of implementation work, etc. Instead, motivate the change by following the Pyramid Principle. If this is hard, critically consider whether the code is high quality. The PR description should be a natural introduction to the code.
 
+After every PR update, including review fixes, rebases and stack changes, re-read the published description against the current diff and validation evidence. Update it where scope, behavior, issue-resolution claims, dependencies, limitations or test instructions/results have changed; remove stale claims rather than append a contradictory update. Do not present earlier-revision test results as current verification. Leave accurate text alone, and verify any description edits on GitHub before handing the PR back for review.
+
 When a PR template section does not apply (for example, the Screenshots section on a change with nothing to show), delete the heading. Never leave commentary explaining why the section is empty.
 
 Finally:

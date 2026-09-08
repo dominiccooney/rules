@@ -156,6 +156,10 @@ enrollment. Before resubmitting, run steps 1–3 over the fix delta itself
 (usually a minutes-long pass, not a full re-review). Do not only re-verify
 the original findings.
 
+For PR-update work, the publishing agent must then perform the description
+refresh required by the development rules' **Pull Request Text** section.
+Read-only reviewers report inaccurate or stale claims instead of editing the PR.
+
 ## Step 5 — Residual pass (optional, usually empty)
 
 One short free-form pass: "anything cross-cutting the inventory missed?"
