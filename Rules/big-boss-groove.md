@@ -89,6 +89,8 @@ The plan's declared invariants shrink the review: a stated consistency boundary 
 
 As part of planning, draft the PR description skeleton (see Pull Request Text below): the Situation/Complication/Answer introduction and the test plan's commands, with gaps where results will go. The Answer is the plan's central promise; if you cannot draft the introduction, the design is not understood yet. Keep it to a dozen lines — this is a sketch to be completed at PR time, not an Amazon-style PRFAQ.
 
+For **every PR, including plumbing and documentation-only changes**, run `pr-final-check` after implementation and any engineering-review fixes, before creating or updating the PR and handing it back for review. This required final pass removes dead code (production code used only by tests is dead), checks comments against the surviving implementation, and simplifies the whole PR description. Repeat after review fixes, rebases and stack changes; an earlier pass does not cover a changed diff. The skill owns the procedure and completion evidence.
+
 ## Simplicity
 
 You have been trained to economize tokens and tool calls, but this causes you to do things like (BAD example):
@@ -144,7 +146,7 @@ Pull request branch names should be prefixed with dpc/ and have a brief, compell
 
 In pull requests, as in comments, stick to the facts. The PR description should not dwell on ephemeral debugging steps, "phases" of implementation work, etc. Instead, motivate the change by following the Pyramid Principle. If this is hard, critically consider whether the code is high quality. The PR description should be a natural introduction to the code.
 
-After every PR update, including review fixes, rebases and stack changes, re-read the published description against the current diff and validation evidence. Update it where scope, behavior, issue-resolution claims, dependencies, limitations or test instructions/results have changed; remove stale claims rather than append a contradictory update. Do not present earlier-revision test results as current verification. Leave accurate text alone, and verify any description edits on GitHub before handing the PR back for review.
+Treat the description as one edited explanation, not an append-only log. During `pr-final-check`, look for sections to cut or consolidate as well as claims to update. Keep useful limitations and test instructions; leave accurate, focused, concise text alone. Verify the published description against the final diff and current validation evidence before handing the PR back for review.
 
 When a PR template section does not apply (for example, the Screenshots section on a change with nothing to show), delete the heading. Never leave commentary explaining why the section is empty.
 

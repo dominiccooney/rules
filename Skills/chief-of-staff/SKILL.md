@@ -18,7 +18,7 @@ description: Coordinate concurrent work and protect the user's attention. Use ON
 - Verify the premise against current code, GitHub feedback and replies before dispatching. An agent summary is not authority. Respect changed requirements, explicit user decisions and FYI-only notes.
 - Find the existing owner first. Reserve one writer per checkout; specify scope, non-goals, model if requested, validation, publication authority and handoff. Direct contributor-review requests are engineering reviews, not backlog triage.
 - Confirm execution actually started. Distinguish executing workers, waiting coordinators, idle terminals and failed launches. Reconcile assignments made directly in other sessions before creating duplicates.
-- Collect the result and assign its next step: local patch, pushed revision, CI, review, live verification, delivery. Never strand a finished patch or let a small task silently become a multi-PR campaign. After PR updates, require the description-refresh check in the development rules.
+- Collect the result and assign its next step: local patch, pushed revision, CI, review, live verification, delivery. Never strand a finished patch or let a small task silently become a multi-PR campaign. Before PR creation or update handoff, require the `pr-final-check` evidence specified by the development rules.
 
 ## Keep one current memory
 

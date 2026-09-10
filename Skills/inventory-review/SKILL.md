@@ -156,9 +156,11 @@ enrollment. Before resubmitting, run steps 1–3 over the fix delta itself
 (usually a minutes-long pass, not a full re-review). Do not only re-verify
 the original findings.
 
-For PR-update work, the publishing agent must then perform the description
-refresh required by the development rules' **Pull Request Text** section.
-Read-only reviewers report inaccurate or stale claims instead of editing the PR.
+For PR creation or update work, hand the reviewed diff and findings to the
+publishing agent, who must run `pr-final-check` after resolving review findings
+and before submission. That skill owns the dead-code, comment and description
+pass; it does not replace this review. Read-only reviewers report findings
+instead of editing code or the PR.
 
 ## Step 5 — Residual pass (optional, usually empty)
 

@@ -2,6 +2,7 @@
 backlog-pr-review
 chief-of-staff
 inventory-review
+pr-final-check
 pr-review-worklist
 pr-screenshots
 systems-change-planning
