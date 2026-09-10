@@ -132,6 +132,16 @@ For every mutable setting that affects behavior, state when a change takes effec
 
 Tests must cross the boundary where the risk lives: use the real implementation rather than a stub that re-implements the invariant, and when the risk is in packaging or an older runtime, test the shipped artifact or pin to the minimum runtime's API definitions.
 
+### Test Failure Triage
+
+Before fixing a test failure found while working on a PR, fetch the current target branch and check whether it fails **in the same way upstream**. Compare the failing test, assertion/error and relevant OS, runtime and configuration using upstream CI logs or an isolated baseline run with the same command. Record the revisions and evidence. Red upstream CI, an unchanged test file, or a failure outside the diff is not enough to call it pre-existing; check whether this PR introduces or worsens it.
+
+- If upstream already fixed the failure, rebase onto that fix and rerun the relevant checks instead of duplicating it.
+- If the same failure exists upstream and this PR does not worsen it, keep the fix out of this PR. Reuse an existing repair PR or create a focused PR from the target branch to green main; land that first, then rebase and revalidate the original PR. Do not bundle unrelated repairs just because they are small.
+- If the failure is introduced or worsened by this PR, fix the regression here. If the baseline is inconclusive or the failure is environment-specific, investigate and report that limitation rather than assume it is upstream or change unrelated code to make a local run green.
+
+Never describe a failed, skipped, interrupted or unrun check as passing. Keep branch validation separate from upstream-failure evidence.
+
 ## Comments
 
 Phrase comments for the "eternal now" of the code as the reader will encounter it after your change. Don't refer to ephemeral artifacts the reader doesn't have access to, like your current task, debugging session, alternative designs considered, or the past state of the system. It is appropriate to positively explain design choices or refer to for example, old on-disk serialization formats still supported.

@@ -91,6 +91,10 @@ Line**, and **Testing and PR Test Plans** guidance.
 
 ## 5. Validate and close the loop
 
+For any failing check, apply the development rules' **Test Failure Triage**
+before editing: compare the same failure upstream, and keep repairs for broken
+main in a separate PR rather than expanding this diff.
+
 After code cleanup, rerun relevant tests, typechecks and lint using the
 repository's commands, and return the cleanup delta to engineering review when
 required. Recheck affected reachability, comments and description against that
