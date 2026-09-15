@@ -1,6 +1,6 @@
 ---
 name: backlog-pr-review
-description: Triage a pull-request backlog methodically, decide whether to close or advance each PR, and write concise, respectful reviewer communication. Use for external-contributor PRs, PRs roughly two weeks old or older from anyone, and closure-message drafting; fresh colleague PRs get a spot review instead. Invokes inventory-review for implementation correctness when a PR reaches engineering review.
+description: Triage a pull-request backlog methodically, decide whether to close or advance each PR, and write concise, respectful reviewer communication. Use for external-contributor PRs, PRs roughly two weeks old or older from anyone, and closure-message drafting; fresh teammate PRs use teammate-pr-review instead. Invokes inventory-review for implementation correctness when a PR reaches engineering review.
 ---
 
 # Backlog PR Review
@@ -28,11 +28,11 @@ weeks old or older from anyone. Those PRs need the staged triage below because
 time and distance make cheap dispositions — superseded, obsolete, duplicated —
 likely.
 
-A fresh PR from a colleague, reviewed on request, is a **spot review**, not a
-backlog item. Skip this skill's triage and disposition machinery: review the
-change directly with the software-engineering and design rules and skills
-(`inventory-review` on the diff, the active writing guidance for the review
-text).
+A fresh PR from a teammate, reviewed on request, is not a backlog item; use
+`teammate-pr-review`. That skill checks the author is a repository member
+with landed commits, asks this skill's relevance, ownership and direction
+questions in short form, and runs `inventory-review` on the diff. It hands
+the PR back here when the author is not a member or the PR is old.
 
 ## Stepped triage
 
@@ -185,13 +185,15 @@ Rewrite the evidence for the person who did the work:
    behavior, file, job, command, or user case.
 4. End with a clear, achievable next step or a genuine path to disagree.
 
-Do not leak `inventory-review` process vocabulary into public text. Translate
-terms such as "inventory item," "failed check," "invariant," "consistency
-boundary," or "boundary test" into the specific situation the contributor
-recognizes. For example, write "the current checks run after a PR leaves draft
-mode," not "the checks do not cover the draft boundary." Technical terms that
-belong to the code or product are fine; unexplained reviewer-framework jargon
-is not.
+Do not leak `inventory-review` process vocabulary into public text (see the
+development rules' **Two Audiences**). Translate terms such as "inventory
+item," "failed check," "invariant," "consistency boundary," "boundary test,"
+"matrix," "cell," "placement," "storage contract," or "level" into the
+specific situation the contributor recognizes: the two things that meet and
+what goes wrong where they meet. For example, write "the current checks run
+after a PR leaves draft mode," not "the checks do not cover the draft
+boundary." Technical terms that belong to the code or product are fine;
+unexplained reviewer-framework jargon is not.
 
 Be specific about deleted or replaced code. Vagaries like "the live path" or
 "the current implementation" give the contributor nothing to search for.

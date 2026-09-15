@@ -107,6 +107,8 @@ For any change that is more than plumbing (i.e. it touches configuration, state,
 - **Before implementing**, use the `systems-change-planning` skill. It locates the essential complexity, chooses the simplest structure to make failures unrepresentable, and derives invariants, environments, and the consistency boundary from the change.
 - **Before opening or updating a PR**, use the `inventory-review` skill. It enumerates the resources, state machines, decision points, contracts, and suspension points in the diff and applies fixed per-type checks. Findings are failed checks — there is no quota, and zero findings is a legitimate outcome. Discovery is read-only; triage before fixing.
 
+When reviewing someone else's PR, choose the skill by the author and the PR's age: `teammate-pr-review` for a fresh PR from a repository member, or from an author I name as trusted; `backlog-pr-review` for everyone else and for any PR roughly two weeks old or older. Both run `inventory-review` on the diff.
+
 The plan's declared invariants shrink the review: a stated consistency boundary collapses whole families of interleaving questions into one check.
 
 As part of planning, draft the PR description skeleton (see Pull Request Text below): the Situation/Complication/Answer introduction and the test plan's commands, with gaps where results will go. The Answer is the plan's central promise; if you cannot draft the introduction, the design is not understood yet. Keep it to a dozen lines — this is a sketch to be completed at PR time, not an Amazon-style PRFAQ.

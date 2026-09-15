@@ -1,6 +1,7 @@
 # Skill directories copied from ../Skills into ~/.cline/skills.
 backlog-pr-review
 chief-of-staff
+teammate-pr-review
 inventory-review
 pr-final-check
 pr-review-worklist
