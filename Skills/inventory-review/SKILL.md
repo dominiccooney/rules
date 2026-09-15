@@ -40,7 +40,9 @@ Enumerate, citing file:line for each item:
    FULL declared domain (from its schema/types), including values no branch
    handles.
 4. **Changed contracts**: fields, events, file formats, options, orderings —
-   anything with more than one producer or consumer.
+   anything with more than one producer or consumer. Mark the **storage
+   contracts** (files, rows, directory layouts, naming schemes) separately;
+   their consumers include other products and other versions.
 5. **Suspension points**: every `await`, `yield`, and event-handler
    registration inside mutating procedures.
 6. **External contracts consumed**: schemas, runtime APIs, executables,
@@ -53,6 +55,16 @@ Enumerate, citing file:line for each item:
    phase to terminal") binds every sibling exit, not just the annotated one.
 8. **Declared consistency boundaries**: every mutex, queue, or "X and Y are
    serialized" invariant the diff introduces or relies on.
+9. **Shared state touched from a product**: every read or write, in
+   product-specific code, of state another product can reach (sessions,
+   settings, persisted files), and every lifecycle transition the diff adds
+   to such state.
+10. **Removals and default changes**: every user-visible behavior the diff
+    removes or whose default it changes, and the reversal mechanism (flag,
+    rollout, retained path) that ships with it.
+11. **Matrix row**: the value the diff adds to or alters on an axis
+    (feature, product, platform, runtime version, compatibility promise),
+    and the plan's row for it if one exists.
 
 ## Step 2 — Apply the per-type checks
 
@@ -79,6 +91,31 @@ producer, consumer, cache, persister, and reporter — including features from
 other PRs. Verify each consumer's assumptions still hold. A migration is a
 WRITE: audit every reader of the new shape and every reader still expecting
 the old one.
+
+**Storage contracts → version and definition check.** Is the path and shape
+defined once, in the shared layer, and imported by every product? For each
+shape added, renamed or removed: what does an older reader do with it, and
+what does the new reader do with old data? Is the shape versioned, with
+unknown fields preserved on rewrite?
+
+**Shared state from a product → placement check.** Does the same transition
+exist for every product that reaches the state, through one shared path? A
+lifecycle transition (delete, resume, migrate, recover) added in one product
+for state created by the shared layer fails this check. Is interpretation of
+a shared contract written once beside its type, or repeated here?
+
+**Removals and default changes → need check.** Does the plan or PR say who
+wants this and how we know, who loses, and how we will learn we were wrong?
+Does a reversal mechanism ship in this diff, and does the old path still
+work behind it? A code-quality reason alone fails this check; the finding is
+a question for the author, not a fix.
+
+**Matrix row → cell check.** Take the plan's row, or build it from the code,
+docs and release history when there is no plan. Every cell must hold n/a
+with a reason, supported with evidence, missing, or conflicts. A blank cell
+is a question for the author. A *missing* cell is a finding unless the PR
+records it as a limitation. A *conflicts* cell is a blocker. Check the
+supported cells the diff touches against the code, not against the plan.
 
 **Suspension points → await audit.** For each mutating procedure: list its
 awaits in order; for each, name the state read before and used after, and
@@ -119,6 +156,11 @@ supported **trigger**, **causal chain** through the code, user-visible
 silent / persistent / destructive). If trigger or chain cannot be stated
 concretely, it is a question for the author, not a finding.
 
+The item and check are for the reviewer's record. Write the trigger, chain
+and impact in the words of the code and the product, so the finding can be
+given to the author as it stands (see the development rules' **Two
+Audiences**).
+
 Triage each finding:
 
 - **Blocker** — must be fixed in this PR. A finding is a blocker when it is
@@ -139,10 +181,12 @@ Triage each finding:
   small, local, and in-scope just because the code works today — duplication
   that can't get out of sync is a defect, not a future concern.
 - **Accepted limitation** — deliberate, acceptable, but non-obvious: request
-  a code comment or PR caveat. Before accepting a limitation, verify the
-  stated rationale against the codebase. An accepted limitation based on a
-  false premise (e.g. "can't import due to cross-world barrier" when runtime
-  imports from that package already exist) is an unreviewed defect.
+  a code comment or PR caveat. A deferred placement finding is recorded
+  this way: the PR names the products that reach the state and what they
+  will observe. Before accepting a limitation, verify the stated rationale
+  against the codebase. An accepted limitation based on a false premise
+  (e.g. "can't import due to cross-world barrier" when runtime imports from
+  that package already exist) is an unreviewed defect.
 - **Not actionable** — record why, then drop.
 
 Apply the **smallest sufficient response** to blockers. Do not recommend

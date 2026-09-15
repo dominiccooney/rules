@@ -78,9 +78,31 @@ Treat copies under `~/.cline` and other installed or generated locations as
 build products, not sources. Direct edits there will be overwritten by the next
 sync. Commit and push durable rule and skill changes from `~/Documents/Cline`.
 
+# Levels of a Change
+
+A change can be right or wrong at five levels:
+
+1. **Need** — do users and the business want it?
+2. **Function** — are the features and content right?
+3. **Structure** — does the design work on paper?
+4. **Realization** — does the code work: correct, fast, secure?
+5. **Surface** — formatting, layout, wording.
+
+Three facts about the levels shape how we work:
+
+- A failure spoils every level below it and none above. A change nobody wants is worthless however well it is built. Judge a change from the top down.
+- Evidence arrives from the bottom up: the formatter answers in seconds, tests in minutes, review in days, users in months. Our checks are strongest where they matter least. Passing every check we have shows the code works; it does not show that anyone wants it.
+- Low-level failures are fixed by iteration. High-level failures are fixed by reversal.
+
+So:
+
+- A removal, a change of default, or a change to a path many users are on must answer, in the plan: who wants this and how we know; who loses; how we will learn we were wrong; and how we would reverse it. Ship it so that reversal is cheap: a flag, a staged rollout, or the old path kept for a release.
+- When fixing a failure, find the level of the cause as well as the level of the symptom. A fix below the cause is a patch, and the failure will return.
+- When a shipped change fails, record the level it failed at and the level it was caught at. The distance between them is the process gap to close.
+
 # Workflow: Plan, Implement, Review
 
-For any change that is more than plumbing (i.e. it touches configuration, state, concurrency, external contracts, or crosses a process/host boundary), bracket the work with two skills:
+For any change that is more than plumbing (i.e. it touches configuration, state, concurrency, external contracts, is reachable from more than one product, crosses a process/host boundary, or removes or changes the default of user-visible behavior), bracket the work with two skills:
 
 - **Before implementing**, use the `systems-change-planning` skill. It locates the essential complexity, chooses the simplest structure to make failures unrepresentable, and derives invariants, environments, and the consistency boundary from the change.
 - **Before opening or updating a PR**, use the `inventory-review` skill. It enumerates the resources, state machines, decision points, contracts, and suspension points in the diff and applies fixed per-type checks. Findings are failed checks — there is no quota, and zero findings is a legitimate outcome. Discovery is read-only; triage before fixing.
@@ -114,11 +136,48 @@ Avoid needless variation. For example, if in one function your refer to somethin
 
 Never introduce a pair of values that must agree but are set independently (a description and a behavior, a writer and a reader, a render order and a selection index). Derive both from one source, or snapshot them together so they travel as a unit.
 
+## Placement
+
+Several products are built on one shared layer, and state one product writes is read by the others. Before implementing, place the behavior by asking which layer owns the state it acts on:
+
+- Behavior lives in the layer that owns its state. A product owns only what other products cannot observe.
+- The layer that creates a resource performs every transition of its lifecycle — resume, delete, migrate, recover — through one path that all products call.
+- Interpretation of a shared contract is written once, next to the type that defines it. Products render the result; they do not derive it again.
+- When a second product needs what a first already has, move the implementation down and make the first product a caller. Do not implement it a second time.
+
+When the owning layer cannot host the behavior yet, record the gap in the plan and PR: which products reach the state, and what they will observe.
+
+## The Matrix
+
+Products, platforms, runtime versions, features and compatibility promises are the axes of a matrix. A cell is where a value on one axis meets a value on another. A change adds a value to an axis, or alters one, and so owns a row: one cell for every value on every other axis.
+
+One value **reaches** another when a user, a process or stored data meets both. Reach is wider than code paths. A user who has two products meets a feature of one and expects it in the other. A file written by one version meets the version that reads it.
+
+Fill every cell in the row with one of:
+
+- **n/a** — nothing meets both. Say why in one clause.
+- **supported** — works, with the evidence.
+- **missing** — reached but not implemented. Record it as a limitation: who meets the gap and what they see.
+- **conflicts** — breaks an assumption the other value relies on. A blocker.
+
+A blank cell is a question, not an answer. A row with no missing or conflicting cells shows that the change fits what exists; whether anyone wants the change is a question for the Need level.
+
+We do not keep the axes' values in a list. Find them afresh from the code, the documentation and the release history. When they cannot be found there, record that as a documentation gap.
+
 ## Contracts
 
 When code interprets an external value — a configuration field, an API response, a file format — model the full declared contract from its authoritative schema or types, not the shape observed in examples.
 
 When you change a shared value's shape, event, location, or API, you have changed a contract: grep for every producer, consumer, cache, and reporter (including features from other PRs) and re-verify each. A migration is a write — audit all readers of both the old and new shapes.
+
+### Storage Contracts
+
+Anything persisted — a file, a row, a directory layout, a naming scheme — is a **storage contract** between every version of every product that reads or writes it. Its path and shape are the contract. Nothing checks both sides of a storage contract, so treat it as more binding than an API.
+
+- Define each path and shape once, in the shared layer, and import it everywhere.
+- Creating or deleting a file, directory or row type changes the contract as much as changing its fields does.
+- For each change, state what an older reader does with the new shape and what the new reader does with old data. Version shapes, and preserve unknown fields on rewrite.
+- The invariant is that every supported version of every product can read what any other wrote, and leaves it readable.
 
 ## Reliability
 

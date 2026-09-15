@@ -1,6 +1,6 @@
 ---
 name: systems-change-planning
-description: Plan a non-trivial code change as a systems change before implementing. Locates the essential complexity, chooses the simplest structure to derisk it, and derives contracts, environments, and consistency boundaries from the change — use before starting implementation of features, fixes touching configuration/state/concurrency, or anything crossing process or host boundaries.
+description: Plan a non-trivial code change as a systems change before implementing. Locates the essential complexity, places the change in the layer that owns its state, chooses the simplest structure to derisk it, and derives contracts, environments, and consistency boundaries from the change — use before starting implementation of features, fixes touching configuration/state/concurrency, anything reachable from more than one product, or anything crossing process or host boundaries.
 ---
 
 # Systems-Change Planning
@@ -11,7 +11,27 @@ review questions into one check.
 
 Skip this skill for plumbing (renames, doc edits, mechanical refactors with
 no behavior change). If step 1 finds no essential complexity, say so and
-stop — a one-line plan is a valid output.
+stop — a one-line plan is a valid output. A removal or a change of default
+is never plumbing: step 0 applies even when step 1 finds nothing.
+
+## Step 0 — Check the need
+
+Apply the development rules' **Levels of a Change**. This step is required
+when the change removes user-visible behavior, changes a default, or alters
+a path many users are on. Skip it otherwise; do not invent business impact
+for a tidy-up.
+
+1. **Who wants this, and how do we know?** Cite the request, issue, data or
+   decision. "It simplifies the code" is a level-3 reason, not a level-1 one.
+2. **Who loses?** A removal's losers exist today and can be counted. Name
+   them and what they lose.
+3. **How will we learn we were wrong?** A metric, a feedback channel, a date
+   to look.
+4. **How do we reverse it?** Choose one: a flag, a staged rollout, or the old
+   path kept for a release. A change that cannot be reversed cheaply needs a
+   stronger answer to question 1.
+
+If question 1 has no answer, stop and ask; do not plan the rest.
 
 ## Step 1 — Model the essential complexity
 
@@ -25,11 +45,24 @@ stop — a one-line plan is a valid output.
    - a single shared resolver both readers call
    - a snapshot type whose fields travel together
    - a state machine with explicit transitions
-   - a declared consistency boundary (see step 4)
+   - a declared consistency boundary (see step 5)
 4. **State the invariants** the structure establishes, one sentence each.
 5. **List non-goals explicitly.** These bound both implementation and review.
 
-## Step 2 — Reuse, or split; do not bypass
+## Step 2 — Place the change with the state it acts on
+
+Decide the layer before the structure. Apply the development rules'
+**Placement** section:
+
+1. Name the state the change reads or writes, and the layer that owns it.
+2. List every product that reaches that state, not only the requesting one.
+3. Place the behavior in the owning layer: lifecycle transitions beside the
+   creation path; interpretation beside the type; an existing product
+   implementation moved down rather than repeated.
+4. If the owning layer cannot host it yet, record the gap: which products
+   reach the state and what they will observe.
+
+## Step 3 — Reuse, or split; do not bypass
 
 When the change needs "what an existing path does, but different in one
 respect," the default is to go THROUGH the existing path. A battle-hardened
@@ -65,7 +98,7 @@ Escalate in order; stop at the first that fits:
 A bypass that needs repeated patching to become safe is evidence the
 boundary was wrong; return here and split instead.
 
-## Step 3 — Derive the plan from the change (not from brainstorming)
+## Step 4 — Derive the plan from the change (not from brainstorming)
 
 Answer only the questions raised by boundaries the change actually touches:
 
@@ -76,14 +109,20 @@ Answer only the questions raised by boundaries the change actually touches:
 | Child processes / executables | Which environment owns the executable and the cwd? (A path valid inside WSL is ENOENT on the Windows host.) |
 | Packaging | Is every dependency present in the extracted artifact with the repository's node_modules unavailable? |
 | Shared or persisted state | Who are ALL the writers and readers? Do they use the same resolver/format? Grep for every consumer before editing. |
+| A storage contract (file, row, directory layout, naming scheme) | Where is the one shared definition of the path and shape? For each shape added, renamed or removed: what does an older reader do with it, and what does the new reader do with old data? Is the shape versioned, with unknown fields preserved on rewrite? |
 | Emulated host behavior | Verify against upstream types, docs, tests, then source — in that order. Do not infer the contract from our own codebase. |
 
-Then build the **execution-boundary matrix**: one row per (process, OS/namespace,
-runtime version, config source, artifact) combination that actually executes
-the changed path. Rows that are unsupported get an explicit "unsupported"
-entry, never a silent assumption of the dev environment.
+Then walk the change's **matrix row** (see the development rules' **The
+Matrix**). Name the value the change adds or alters, and its axis. Find the
+values on the other axes — product, feature, platform, runtime version,
+config source, artifact, compatibility promise — from the code, docs and
+release history, not from the requesting product or the dev environment.
+Fill one cell for each: n/a with its reason, supported with its evidence,
+missing as a limitation, or conflicts as a blocker. Where a cell's answer
+depends on a third axis, split that cell. Write down any axis value you
+could not find in the repository.
 
-## Step 4 — Declare the consistency boundary
+## Step 5 — Declare the consistency boundary
 
 For every mutable setting or dependency involved, state exactly when a change
 becomes effective: immediately / next tool call / next model request / next
@@ -91,24 +130,30 @@ turn / next session / next restart. All values that must agree transition at
 that same boundary. Write the boundary as one sentence in the plan and later
 in a code comment.
 
-## Step 5 — Plan tests at the boundary where risk lives
+## Step 6 — Plan tests at the boundary where risk lives
 
 | Risk | Test at |
 |---|---|
 | Schema interpretation | contract fixture using the real declared shape (incl. the branches not taken) |
+| Storage contract | fixture from the oldest supported writer read by the new code, and the new shape read by the old reader; unknown fields survive a rewrite |
+| Shared-state lifecycle | create through one product's entry point and resume/delete through another's |
 | Packaging | extracted artifact, repo dependencies renamed away |
 | Runtime floor | typecheck/test pinned to the minimum runtime's API definitions |
 | Config transition | change the setting immediately before AND immediately after the declared boundary |
 | Cross-module behavior | integration through the real callers — never a stub that re-implements the invariant |
 
-## Step 6 — Decide refactor-first
+## Step 7 — Decide refactor-first
 
 If implementing the model forces touching code for reasons OTHER than the
 behavior change, split a preparatory refactor into its own commit/PR ("make
 the change easy, then make the easy change"). If the change is already local,
 skip — a mandatory prep-refactor is its own form of scope creep.
 
-## Step 7 — Draft the PR description skeleton
+Moving a capability down from one product into the shared layer (step 2) is
+the usual refactor-first case: land the move with that product as the only
+caller, then add the second product in the behavior PR.
+
+## Step 8 — Draft the PR description skeleton
 
 Sketch the eventual PR description now, with gaps: the Situation/Complication/
 Answer introduction (the Answer is the central promise from step 1) and the
@@ -118,8 +163,10 @@ dozen lines; this is a sketch to complete at PR time, not a PRFAQ.
 
 ## Output format
 
-A plan of roughly one page: promise, essential complexity, chosen structure,
+A plan of roughly one page: need (when step 0 applies: who wants it, who
+loses, how we learn, how we reverse), promise, essential complexity, chosen
+structure, placement (owning layer, reachable products, any recorded gap),
 reuse-or-split decision (with bypassed-guard inventory if bypassing),
-invariants (numbered), consistency boundary, boundary matrix, test plan,
+invariants (numbered), consistency boundary, matrix row, test plan,
 non-goals, refactor-first decision, PR skeleton. Then implement in the order:
 model → API → tests-on-the-real-implementation → wiring.
