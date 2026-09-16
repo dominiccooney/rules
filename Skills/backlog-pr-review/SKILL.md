@@ -159,7 +159,11 @@ Gate 6 is one handoff, not a second independent review:
    purpose and evidence already established at Gates 1–5.
 3. Add its inventory, checks, findings, and boundary-test results to this PR's
    evidence record.
-4. Resume this skill to choose and take the disposition: approve or merge when
+4. Check that every inventory category is filled for the recorded base and
+   head, with explicit omissions. Invoking the skill, receiving a summary, or
+   seeing green tests/CI is not completion. An omission that can reach the PR's
+   central promise blocks approval or merge.
+5. Resume this skill to choose and take the disposition: approve or merge when
    there are no blockers and authority permits it; request changes for blockers;
    or take the smallest safe step that advances the PR.
 
@@ -168,6 +172,9 @@ action and contributor communication. Do not run a second inventory pass merely
 to confirm the first; repeat it only when the reviewed diff or a relevant
 `main` contract changed. Gate 6 is an additional invocation context for
 `inventory-review`; it does not replace that skill's pre-PR development review.
+On an updated PR, use earlier findings as leads and apply the inventory to the
+full current diff; resolved threads and green CI do not rule out new failures
+introduced by the fixes.
 
 ### Contributor-facing communication
 
@@ -349,6 +356,14 @@ items under explicit reviewer-action categories such as:
 - commented on and closed by this reviewer;
 - no remote action — already resolved; or
 - no remote action — waiting on a contributor, maintainer decision, or CI.
+
+The GitHub account is shared with its human owner, who can review at the same
+time as an automated reviewer. Same-login comments, approvals or change
+requests that appear during a run are normal concurrent activity, not proof
+that this reviewer performed them. Re-read them as current review context, but
+attribute a mutation to this reviewer only when its own submitted request and
+result prove the action. Never claim, repeat, dismiss or reverse a same-login
+review merely because it is absent from this run's local action log.
 
 Report remote outcomes in a separate field or sentence, with the actor named.
 For example: "Updated and pushed by this reviewer; later approved and merged by

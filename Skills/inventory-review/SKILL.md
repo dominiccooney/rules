@@ -28,6 +28,13 @@ caller owns edits, GitHub actions, and other state changes.
 **Discovery is strictly read-only.** Build the full inventory and findings
 list before proposing or making any edit. Do not broaden scope during review.
 
+Invoking this skill is not completing it. The review is complete only when its
+output fills every inventory category below for the current diff: enumerate the
+items, write `none` with the search evidence when a category has no items, and
+record anything not inspected as an omission. An omission that can reach the
+change's central promise leaves the review open; it cannot support "no
+findings," approval, or merge.
+
 ## Step 1 — Build the inventory from the diff
 
 Enumerate, citing file:line for each item:
@@ -197,8 +204,12 @@ broad refactoring unless a blocker cannot be fixed locally.
 Fixes are diffs too. Each round of fixes introduces new exits, new locks,
 new callbacks — each with its own inherited obligations and boundary
 enrollment. Before resubmitting, run steps 1–3 over the fix delta itself
-(usually a minutes-long pass, not a full re-review). Do not only re-verify
-the original findings.
+(usually a minutes-long pass, not a second exhaustive review of unchanged
+code). Use the earlier findings and inventory as leads, not as the scope: read
+the full current PR diff, rebuild every inventory category affected by the new
+head or current target branch, and look for new failures introduced by the
+fixes or newly exposed by their interactions. Do not only re-verify the
+original findings.
 
 For PR creation or update work, hand the reviewed diff and findings to the
 publishing agent, who must run `pr-final-check` after resolving review findings
@@ -211,10 +222,30 @@ instead of editing code or the PR.
 One short free-form pass: "anything cross-cutting the inventory missed?"
 Expected answer: nothing. Do not pad.
 
+## Validation effort
+
+Spend local validation time at the boundary where the risk lives. Run the
+smallest focused test, typecheck, build or artifact check that can disprove the
+review conclusion. Passing tests are supporting evidence after the inventory
+identifies that boundary; they do not replace the consumer, lifecycle,
+concurrency, placement or matrix checks above.
+
+Do not routinely run an entire repository test suite merely to add another
+green signal. Read the current head's CI checks and logs, and let CI provide
+broad regression coverage when the relevant workflow exists. Run a broad suite
+locally only when CI cannot provide the needed evidence, the risk depends on a
+local environment CI does not cover, or a failure needs diagnosis. Never wait
+for or rerun broad CI instead of completing the engineering review; report
+pending, skipped and failed checks accurately.
+
 ## Output format
 
-1. Inventory (numbered, with file:line)
-2. Checks applied per item (terse; "OK" is a fine result)
-3. Findings with triage labels
-4. For blockers only: smallest sufficient fix, and the test that would have
+1. Reviewed base and head revisions
+2. Inventory (every category numbered, with file:line; `none` plus search
+   evidence where empty)
+3. Checks applied per item (terse; "OK" is a fine result)
+4. Findings with triage labels
+5. Omissions and their effect on the conclusion (`none` is valid)
+6. Focused local validation and current-head CI evidence, kept separate
+7. For blockers only: smallest sufficient fix, and the test that would have
    caught it at the boundary where the risk lives

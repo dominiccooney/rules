@@ -78,8 +78,19 @@ not invent business impact for a change that has none.
 
 Invoke `inventory-review` once, on the diff as it applies to the current
 `main`, with the answers from step 2. It returns the inventory, checks and
-triaged findings. Do not run a second pass to confirm the first; repeat it
-only when the head or a relevant `main` contract changes.
+triaged findings. Do not treat the invocation, an agent summary, passing tests,
+or green CI as completion. Before acting, read its evidence record and verify
+that every inventory category is filled for the reviewed base and head, and
+that it lists omissions explicitly. An omission that can reach the PR's central
+promise blocks approval.
+
+For a re-review after author changes, first read the past findings and replies,
+then review the PR anew at its current head. The past findings are leads, not a
+checklist or a limit on scope. Read the full current diff, re-inventory every
+category affected by the fixes or a changed `main`, and look for new issues at
+the seams between the fixes and the rest of the change. Do not approve merely
+because the old comments are resolved, the requested lines changed, or CI is
+green. Do not run a second unchanged-head pass merely to confirm the first.
 
 ## Step 4 — Write the review
 
@@ -98,6 +109,13 @@ Take the action your authority allows: approve when there are no blockers,
 request changes for blockers, or comment. Before any GitHub mutation,
 re-read the head SHA and existing reviews; rebuild affected findings if they
 changed.
+
+The GitHub account is shared with its human owner, who may use it while this
+review is running. A review or comment from the same login can therefore appear
+without being this reviewer's action; that is normal concurrent activity.
+Re-read it as review context, do not duplicate or contradict it accidentally,
+and attribute only mutations this run can prove from its own submitted request
+and result. Do not infer authorship from the login and timestamp alone.
 
 Report by the actions this reviewer took, following `backlog-pr-review`'s
 **Sweep reporting and action attribution**. Name the actor for any later
