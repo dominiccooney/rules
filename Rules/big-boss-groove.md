@@ -264,9 +264,15 @@ Finally:
 
 PRs must include a test plan that a new teammate could follow their first week.
 
-PR test plans SHOULD show specific commands to run relevant tests. DON'T list tests added/changed with commentary, that doesn't help people run the tests. The tests themselves should be self explanatory about what they are testing.
+PR test plans SHOULD show specific commands to run relevant tests. Put automated commands in a fenced Markdown code block, not in individual bullets, so that the reader can copy and paste them. When several commands run from the same directory, change to that directory once and return when finished: use `cd foo/bar` and `cd -`, `pushd foo/bar` and `popd`, or the appropriate Windows equivalent for a Windows-specific test. Do not repeat `cd foo/bar &&` before every command.
+
+Do not include `check-types`, `format`, `lint`, `build`, or similar commands merely because the hooks run them. These checks are not a test procedure. Include one only when the change affects that tool and running the command specifically tests the change, such as a formatter or linter change.
+
+DON'T list tests added/changed with commentary; that doesn't help people run the tests. The tests themselves should be self explanatory about what they are testing.
 
 Automated tests are preferable to manual tests. However manual tests can be useful for QA or curious people, so adding brief manual test plans is also good. Relying only on manual tests should only happen in exceptional situations.
+
+When computer-use skills are available, use them to verify the change and include a manual test plan. After any shell commands needed to start the system under test, write the manual procedure as numbered steps that a person can follow. At each step that exposes behavior central to the change, state what the tester should verify. Keep the procedure short and deterministic. Put shared setup requirements in a brief preamble instead of spelling out every setup action in the steps.
 
 "Performative" automated testing--writing tests which provide little sensitivity to likely changes of interest--is harmful because it clutters the test suite and distracts from the effective tests. Such tests MUST be avoided.
 
