@@ -35,6 +35,28 @@ record anything not inspected as an omission. An omission that can reach the
 change's central promise leaves the review open; it cannot support "no
 findings," approval, or merge.
 
+## Step 0: Levels of a Change
+
+A change can be right or wrong at five levels:
+
+1. **Need** — do users and the business want it?
+2. **Function** — are the features and content right?
+3. **Structure** — does the design work on paper?
+4. **Realization** — does the code work: correct, fast, secure?
+5. **Surface** — formatting, layout, wording.
+
+Three facts about the levels shape how we work:
+
+- A failure spoils every level below it and none above. A change nobody wants is worthless however well it is built. Judge a change from the top down.
+- Evidence arrives from the bottom up: the formatter answers in seconds, tests in minutes, review in days, users in months. Our checks are strongest where they matter least. Passing every check we have shows the code works; it does not show that anyone wants it.
+- Low-level failures are fixed by iteration. High-level failures are fixed by reversal.
+
+So:
+
+- A removal, a change of default, or a change to a path many users are on must answer, in the plan: who wants this and how we know; who loses; how we will learn we were wrong; and how we would reverse it. Ship it so that reversal is cheap: a flag, a staged rollout, or the old path kept for a release.
+- When fixing a failure, find the level of the cause as well as the level of the symptom. A fix below the cause is a patch, and the failure will return.
+- When a shipped change fails, record the level it failed at and the level it was caught at. The distance between them is the process gap to close.
+
 ## Step 1 — Build the inventory from the diff
 
 Enumerate, citing file:line for each item:

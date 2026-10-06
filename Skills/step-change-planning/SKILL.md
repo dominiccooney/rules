@@ -1,9 +1,9 @@
 ---
-name: systems-change-planning
-description: Plan a non-trivial code change as a systems change before implementing. Locates the essential complexity, places the change in the layer that owns its state, chooses the simplest structure to derisk it, and derives contracts, environments, and consistency boundaries from the change — use before starting implementation of features, fixes touching configuration/state/concurrency, anything reachable from more than one product, or anything crossing process or host boundaries.
+name: step-change-planning
+description: Plan one step of a non-trivial code change as a systems change before implementing. Locates the essential complexity, places the change in the layer that owns its state, chooses the simplest structure to derisk it, and derives contracts, environments, and consistency boundaries from the change — use before starting implementation of features, fixes touching configuration/state/concurrency, anything reachable from more than one product, or anything crossing process or host boundaries.
 ---
 
-# Systems-Change Planning
+# Step-Change Planning
 
 Produce a short written plan BEFORE editing code. The plan's purpose is to
 make later review cheap: every declared invariant collapses a family of
@@ -13,25 +13,6 @@ Skip this skill for plumbing (renames, doc edits, mechanical refactors with
 no behavior change). If step 1 finds no essential complexity, say so and
 stop — a one-line plan is a valid output. A removal or a change of default
 is never plumbing: step 0 applies even when step 1 finds nothing.
-
-## Step 0 — Check the need
-
-Apply the development rules' **Levels of a Change**. This step is required
-when the change removes user-visible behavior, changes a default, or alters
-a path many users are on. Skip it otherwise; do not invent business impact
-for a tidy-up.
-
-1. **Who wants this, and how do we know?** Cite the request, issue, data or
-   decision. "It simplifies the code" is a level-3 reason, not a level-1 one.
-2. **Who loses?** A removal's losers exist today and can be counted. Name
-   them and what they lose.
-3. **How will we learn we were wrong?** A metric, a feedback channel, a date
-   to look.
-4. **How do we reverse it?** Choose one: a flag, a staged rollout, or the old
-   path kept for a release. A change that cannot be reversed cheaply needs a
-   stronger answer to question 1.
-
-If question 1 has no answer, stop and ask; do not plan the rest.
 
 ## Step 1 — Model the essential complexity
 

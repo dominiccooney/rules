@@ -29,10 +29,8 @@ time and distance make cheap dispositions â€” superseded, obsolete, duplicated â
 likely.
 
 A fresh PR from a teammate, reviewed on request, is not a backlog item; use
-`teammate-pr-review`. That skill checks the author is a repository member
-with landed commits, asks this skill's relevance, ownership and direction
-questions in short form, and runs `inventory-review` on the diff. It hands
-the PR back here when the author is not a member or the PR is old.
+`teammate-pr-review` skill instead. That skill may hand  the PR back here when
+the author is not a teammate or the PR is old.
 
 ## Stepped triage
 
