@@ -67,7 +67,12 @@ If the change DOES make sense, commit your changes. If the Mikado goal is met, y
 
 If there ARE errors in step 3, continue to step 4. Note, if you learned of these errors asynchronously (for example, through Greptile's feedback, reviewer feedback, etc.) then you should identify the closest relevant goal in the Mikado graph and consider that the current goal for steps 4-7. If there are multiple relevant pieces of feedback, find the earliest relevant goal and treat that as the current goal and focus on errors related to that goal specifically.
 
-4. Come up with immediate solutions to the errors. These are an idea or condition, not specific fixes.
+4. Come up with immediate solutions to the errors. These are an idea or condition, NOT specific fixes. The conditions should be stated parsimoniously enough to unblock the dependent goal.
+
+Sometimes, conflicts with existing code are inevitable. We will work through them in subsequent iterations as a way to produce excellent code that models the domain with high fidelity. In contrast, artificial constraints from premature solutions can create spurious conflicts and degrade the architecture with band-aids. No band-aids.
+
+Consider the side effects engendered by the new condition. These should be limited to the smallest set possible to unblock the dependent goal, and only set up in direct opposition to existing code when the existing code is evidently naive or broken.
+
 5. Draw the solution(s) in step 4 as new prerequisites to the current goal.
 6. Revert your changes. If, in step 3, you discovered these errors asynchronously you should revert everything up to and including the current goal.
 7. Select the next prerequisite to work with. These must be leaves of your Mikado graph.
@@ -95,7 +100,7 @@ You have been trained to economize tokens and tool calls, but this causes you to
    ...
 ```
 
-However for clarity and consistency with the surrounding code, you should not use a dynamic import but instead insert the import statement at the start of the file.
+In this specific example, for clarity and consistency with the surrounding code you should not use a dynamic import but instead insert the import statement at the start of the file. The principle here is that we are prioritizing clean architecture and correctness over saving tokens.
 
 You should eliminate the possibility of bugs arising by reducing repetition. For example:
 
