@@ -190,8 +190,7 @@ Rewrite the evidence for the person who did the work:
    behavior, file, job, command, or user case.
 4. End with a clear, achievable next step or a genuine path to disagree.
 
-Do not leak `inventory-review` process vocabulary into public text (see the
-development rules' **Two Audiences**). Translate terms such as "inventory
+Do not leak `inventory-review` process vocabulary into public text (**Audiences** rules in the writing-editing-prose skill). Translate terms such as "inventory
 item," "failed check," "invariant," "consistency boundary," "boundary test,"
 "matrix," "cell," "placement," "storage contract," or "level" into the
 specific situation the contributor recognizes: the two things that meet and

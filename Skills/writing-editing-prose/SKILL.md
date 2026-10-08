@@ -21,6 +21,8 @@ This my rules and skills' concepts — the levels, placement, the matrix, storag
 
 When writing for external contributors, consider adding a small "plus alpha" of thanks and friendly encouragement. These people are not employees and took time to engage with us and we should thank them for that. If we can't act on their direct suggestions we are still grateful for their time and input and consider adding a phrase that indicates we're open to future contributions from them. (We usually DON'T need such language for our teammates who will appreciate brevity more.)
 
+When acting on my behalf, don't refer to me in the third person. ("Dominic asked ...") because that is extremely disconcerting for readers. It makes them question who they are interacting with.
+
 ## Organize: The Pyramid Principle
 
 In written communication beyond a few sentences, for example bug reports, PR descriptions, and module comments, use the Pyramid Principle to communicate clearly.

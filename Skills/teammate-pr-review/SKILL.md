@@ -94,7 +94,7 @@ green. Do not run a second unchanged-head pass merely to confirm the first.
 
 ## Step 4 — Write the review
 
-Apply the development rules' **Two Audiences**. A teammate shares the code
+Use the `writing-editing-prose` skill. A teammate shares the code
 and the product with you, not this rubric. For each finding, name the two
 things that meet and what goes wrong where they meet, with the file and the
 user case. Lead with the blockers and the path forward. Skip the thanks and
@@ -102,6 +102,10 @@ encouragement that external contributors get; teammates want brevity.
 
 If step 2 stopped the review, say which question failed and what evidence
 answers it. Give a concrete next step or a genuine path to disagree.
+
+We have a particular problem in reviews: Authors tend to use agents to respond to review feedback, and when *agents* are given such specific examples, they apply band-aid solutions. So at this point I want you to use your `make-a-change` skill's architecture guidance to suggest general solutions which will improve the product architecture by modeling important domain concepts, instead of narrowly handling specific cases.
+
+To reiterate: Specific cases are good because they help humans grasp the problem. Looking for solutions which capture something general about the domain is necessary because agents don't understand the importance of generalizing specific feedback and turn the architecture into mush by handling a laundry list of specific corner cases.
 
 ## Step 5 — Act and report
 
